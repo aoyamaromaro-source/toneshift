@@ -1,0 +1,17 @@
+{
+  "name": "ToneShift",
+  "short_name": "ToneShift",
+  "description": "30〜50代男性向けビジネスカジュアルコーデ提案アプリ",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F5F3EE",
+  "theme_color": "#1C1A17",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='40' fill='%231C1A17'/><text x='96' y='130' font-size='100' text-anchor='middle'>👔</text></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    }
+  ]
+}
