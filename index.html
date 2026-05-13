@@ -9,338 +9,189 @@
 <meta name="theme-color" content="#1C1A17">
 <link rel="manifest" href="manifest.json">
 <title>ToneShift</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg:      #F5F3EE;
-  --bg2:     #EDEAE3;
-  --bg3:     #E2DED6;
-  --surface: #FDFCFA;
-  --text:    #1C1A17;
-  --text2:   #6B6760;
-  --text3:   #A09D97;
-  --accent:  #1C1A17;
-  --gold:    #B07830;
-  --gold-lt: #F0E6D3;
-  --red:     #B03020;
-  --green:   #2D6A4F;
-  --border:  #D8D4CB;
-  --border2: #E8E4DC;
-  --r:       14px;
-  --r-sm:    9px;
-  --safe-b:  env(safe-area-inset-bottom, 0px);
-  --safe-t:  env(safe-area-inset-top, 0px);
+:root{
+  --bg:#F5F3EE;--bg2:#EDEAE3;--bg3:#E2DED6;--surface:#FDFCFA;
+  --text:#1C1A17;--text2:#6B6760;--text3:#A09D97;--accent:#1C1A17;
+  --gold:#B07830;--gold-lt:#F0E6D3;--red:#B03020;--green:#2D6A4F;
+  --border:#D8D4CB;--border2:#E8E4DC;--r:14px;--r-sm:9px;
+  --safe-b:env(safe-area-inset-bottom,0px);--safe-t:env(safe-area-inset-top,0px);
 }
-
-* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-html { height: 100%; }
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: 'DM Sans', sans-serif;
-  min-height: 100%;
-  overscroll-behavior: none;
-  -webkit-font-smoothing: antialiased;
-}
-
-/* ── LAYOUT ── */
-.app { max-width: 430px; margin: 0 auto; min-height: 100dvh; display: flex; flex-direction: column; position: relative; }
-.status-bar-spacer { height: var(--safe-t); background: var(--bg); }
-
-.topbar {
-  padding: 10px 20px 6px;
-  display: flex; align-items: center; justify-content: space-between;
-  background: var(--bg);
-  position: sticky; top: 0; z-index: 40;
-  border-bottom: 1px solid var(--border2);
-}
-.logo { font-family: 'DM Serif Display', serif; font-size: 20px; letter-spacing: -0.3px; }
-.logo em { color: var(--gold); font-style: normal; }
-.topbar-right { display: flex; align-items: center; gap: 10px; }
-.topbar-date { font-size: 11px; color: var(--text3); font-weight: 400; }
-
-.content { flex: 1; overflow-y: auto; padding: 16px 18px calc(80px + var(--safe-b)); }
-
-/* ── BOTTOM NAV ── */
-.nav {
-  position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
-  width: 100%; max-width: 430px;
-  background: rgba(253,252,250,0.92);
-  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-  border-top: 1px solid var(--border);
-  display: flex; z-index: 50;
-  padding-bottom: var(--safe-b);
-}
-.nav-btn {
-  flex: 1; display: flex; flex-direction: column; align-items: center;
-  padding: 9px 4px 6px; border: none; background: none; cursor: pointer;
-  gap: 3px; color: var(--text3); font-family: 'DM Sans', sans-serif;
-  font-size: 10px; font-weight: 500; transition: color 0.15s;
-  position: relative;
-}
-.nav-btn.active { color: var(--text); }
-.nav-btn.active::after {
-  content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
-  width: 24px; height: 2px; background: var(--gold); border-radius: 0 0 2px 2px;
-}
-.nav-icon { font-size: 22px; line-height: 1; }
-
-/* ── SCREENS ── */
-.screen { display: none; animation: fadeIn 0.18s ease; }
-.screen.active { display: block; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
-
-/* ── CARDS ── */
-.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 16px; margin-bottom: 12px; }
-.card-label { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text3); margin-bottom: 11px; }
-
-/* ── HOME ── */
-.greeting-wrap { padding: 4px 0 16px; }
-.greeting { font-family: 'DM Serif Display', serif; font-size: 24px; line-height: 1.25; }
-.greeting-sub { font-family: 'DM Sans', sans-serif; font-size: 12px; color: var(--text3); margin-top: 4px; }
-
-.schedule-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-bottom: 14px; }
-.sched-btn {
-  padding: 9px 6px; border: 1px solid var(--border); border-radius: var(--r-sm);
-  background: var(--bg2); font-size: 12px; cursor: pointer; color: var(--text2);
-  font-family: 'DM Sans', sans-serif; font-weight: 500; transition: all 0.15s; text-align: center;
-}
-.sched-btn:active { transform: scale(0.97); }
-.sched-btn.selected { background: var(--accent); color: var(--surface); border-color: var(--accent); }
-
-.formal-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
-.formal-header .lbl { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text3); }
-.formal-header .num { font-size: 18px; font-weight: 600; font-family: 'DM Serif Display', serif; }
-
-input[type=range] {
-  -webkit-appearance: none; width: 100%; height: 2px; border-radius: 1px;
-  background: linear-gradient(to right, var(--gold) calc((var(--val,3)-1)/4*100%), var(--border) calc((var(--val,3)-1)/4*100%));
-  outline: none; cursor: pointer;
-}
-input[type=range]::-webkit-slider-thumb {
-  -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%;
-  background: var(--surface); cursor: pointer;
-  border: 2px solid var(--gold); box-shadow: 0 1px 6px rgba(0,0,0,0.15);
-}
-.formal-ends { display: flex; justify-content: space-between; font-size: 10px; color: var(--text3); margin-top: 5px; }
-
-.recommend-btn {
-  width: 100%; padding: 15px; background: var(--accent); color: var(--surface);
-  border: none; border-radius: var(--r); font-size: 14px; font-weight: 600;
-  cursor: pointer; font-family: 'DM Sans', sans-serif; letter-spacing: 0.02em;
-  transition: opacity 0.15s; display: flex; align-items: center; justify-content: center; gap: 8px;
-}
-.recommend-btn:active { opacity: 0.82; }
-
-/* ── RESULT ── */
-.result-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 16px; margin-top: 14px; }
-.result-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
-.result-title { font-family: 'DM Serif Display', serif; font-size: 18px; }
-.score-badge { background: var(--gold); color: #fff; border-radius: 20px; padding: 3px 11px; font-size: 11px; font-weight: 600; letter-spacing: 0.05em; }
-.coord-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 13px; }
-.coord-cell { border-radius: var(--r-sm); overflow: hidden; background: var(--bg2); }
-.coord-cell img { width: 100%; aspect-ratio: 3/4; object-fit: cover; display: block; }
-.coord-cell-ph { width: 100%; aspect-ratio: 3/4; display: flex; align-items: center; justify-content: center; }
-.coord-swatch { width: 40px; height: 40px; border-radius: 8px; border: 1px solid rgba(0,0,0,0.08); }
-.coord-meta { padding: 6px 8px; }
-.coord-cat { font-size: 9px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text3); }
-.coord-name { font-size: 11px; font-weight: 600; margin-top: 2px; line-height: 1.3; }
-.coord-days { font-size: 10px; color: var(--gold); font-weight: 600; margin-top: 2px; }
-
-.reasons { font-size: 12px; color: var(--text2); line-height: 1.85; margin-bottom: 13px; }
-.reasons strong { color: var(--text); }
-.result-btns { display: flex; gap: 8px; }
-.result-btns button {
-  flex: 1; padding: 11px; border-radius: var(--r-sm); font-size: 13px; font-weight: 600;
-  cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.15s;
-  border: 1px solid var(--border); background: var(--bg2); color: var(--text);
-}
-.result-btns button:active { transform: scale(0.97); }
-.result-btns button.primary { background: var(--accent); color: var(--surface); border-color: var(--accent); }
-
-/* ── WARDROBE ── */
-.wb-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
-.screen-title { font-family: 'DM Serif Display', serif; font-size: 22px; }
-.add-fab {
-  padding: 8px 16px; background: var(--accent); color: var(--surface); border: none;
-  border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer;
-  font-family: 'DM Sans', sans-serif; transition: opacity 0.15s;
-}
-.add-fab:active { opacity: 0.8; }
-
-.cat-tabs { display: flex; gap: 6px; margin-bottom: 14px; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
-.cat-tabs::-webkit-scrollbar { display: none; }
-.cat-tab {
-  padding: 5px 14px; border: 1px solid var(--border); border-radius: 20px;
-  font-size: 12px; font-weight: 500; cursor: pointer; background: var(--surface);
-  color: var(--text2); font-family: 'DM Sans', sans-serif; white-space: nowrap; transition: all 0.15s;
-}
-.cat-tab.active { background: var(--accent); color: var(--surface); border-color: var(--accent); }
-
-.clothes-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-.cloth-card {
-  background: var(--surface); border: 1px solid var(--border2); border-radius: var(--r);
-  overflow: hidden; cursor: pointer; transition: border-color 0.15s, box-shadow 0.15s;
-  -webkit-tap-highlight-color: transparent;
-}
-.cloth-card:active { transform: scale(0.98); border-color: var(--gold); }
-.cloth-photo { width: 100%; aspect-ratio: 3/4; object-fit: cover; display: block; }
-.cloth-ph { width: 100%; aspect-ratio: 3/4; display: flex; align-items: center; justify-content: center; }
-.cloth-info { padding: 10px 12px 12px; border-top: 1px solid var(--border2); }
-.cloth-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.cloth-meta { font-size: 11px; color: var(--text3); margin-top: 2px; }
-.cloth-scores { display: flex; gap: 5px; margin-top: 6px; flex-wrap: wrap; }
-.sc { font-size: 10px; color: var(--text3); background: var(--bg3); padding: 2px 7px; border-radius: 4px; font-weight: 500; }
-.cloth-tap-hint { font-size: 10px; color: var(--gold); margin-top: 5px; font-weight: 500; }
-
-/* ── HISTORY ── */
-.history-list { display: flex; flex-direction: column; gap: 8px; }
-.hist-item { background: var(--surface); border: 1px solid var(--border2); border-radius: var(--r); padding: 14px; }
-.hist-top { display: flex; justify-content: space-between; margin-bottom: 5px; }
-.hist-date { font-size: 11px; color: var(--text3); }
-.hist-sched { font-size: 11px; font-weight: 600; color: var(--gold); }
-.hist-coord { font-size: 13px; font-weight: 500; margin-bottom: 5px; line-height: 1.4; }
-.hist-note { font-size: 11px; color: var(--text2); margin-top: 4px; font-style: italic; }
-.stars { font-size: 13px; letter-spacing: 1px; }
-
-/* ── MODAL (slide-up sheet) ── */
-.modal-bg {
-  position: fixed; inset: 0; background: rgba(28,26,23,0.5);
-  z-index: 200; display: flex; align-items: flex-end; justify-content: center;
-  backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
-  opacity: 0; transition: opacity 0.22s; pointer-events: none;
-}
-.modal-bg.open { opacity: 1; pointer-events: auto; }
-.modal-sheet {
-  background: var(--surface); border-radius: var(--r) var(--r) 0 0;
-  width: 100%; max-width: 430px; max-height: 93dvh;
-  overflow-y: auto; padding: 0 20px calc(24px + var(--safe-b));
-  transform: translateY(100%); transition: transform 0.26s cubic-bezier(0.32,0.72,0,1);
-  -webkit-overflow-scrolling: touch;
-}
-.modal-bg.open .modal-sheet { transform: translateY(0); }
-.modal-handle-wrap { position: sticky; top: 0; background: var(--surface); padding: 12px 0 0; z-index: 1; margin-bottom: 4px; }
-.modal-handle { width: 36px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 14px; }
-.modal-title { font-family: 'DM Serif Display', serif; font-size: 20px; margin-bottom: 18px; }
-
-/* form */
-.f-label { font-size: 10px; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase; color: var(--text3); display: block; margin-bottom: 6px; }
-.f-input, .f-select {
-  width: 100%; padding: 11px 13px; border: 1px solid var(--border); border-radius: var(--r-sm);
-  background: var(--bg); color: var(--text); font-size: 14px;
-  font-family: 'DM Sans', sans-serif; outline: none; transition: border-color 0.15s; appearance: none;
-}
-.f-input:focus, .f-select:focus { border-color: var(--gold); }
-.f-row { margin-bottom: 14px; }
-.f-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
-.f-slider-row { display: flex; align-items: center; gap: 10px; }
-.f-slider-row input[type=range] { flex: 1; }
-.f-slider-val { font-family: 'DM Serif Display', serif; font-size: 18px; min-width: 22px; text-align: right; }
-
-/* photo */
-.photo-area {
-  width: 100%; aspect-ratio: 4/3; border: 2px dashed var(--border); border-radius: var(--r);
-  background: var(--bg2); display: flex; align-items: center; justify-content: center;
-  flex-direction: column; gap: 6px; position: relative; overflow: hidden; margin-bottom: 8px;
-  cursor: pointer;
-}
-.photo-area img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: calc(var(--r) - 2px); }
-.photo-area .ph-icon { font-size: 30px; pointer-events: none; }
-.photo-area .ph-txt { font-size: 12px; color: var(--text3); pointer-events: none; }
-.photo-btns { display: flex; gap: 7px; margin-bottom: 8px; }
-.photo-btn {
-  flex: 1; padding: 9px 6px; border: 1px solid var(--border); border-radius: var(--r-sm);
-  background: var(--bg); font-size: 12px; font-weight: 500; cursor: pointer; color: var(--text2);
-  font-family: 'DM Sans', sans-serif; text-align: center; transition: all 0.15s;
-}
-.photo-btn:active { border-color: var(--gold); color: var(--gold); }
-.photo-btn.danger { color: var(--red); border-color: #f0d0cc; background: #fdf5f4; }
-input[type=file].hidden { display: none; }
-
-.url-wrap { display: flex; gap: 6px; margin-top: 6px; }
-.url-wrap input { flex: 1; font-size: 13px; }
-.url-go {
-  padding: 11px 14px; border: 1px solid var(--gold); border-radius: var(--r-sm);
-  background: var(--surface); font-size: 12px; font-weight: 600; cursor: pointer;
-  color: var(--gold); font-family: 'DM Sans', sans-serif; white-space: nowrap; transition: all 0.15s;
-}
-.url-go:active { background: var(--gold); color: #fff; }
-.url-msg { font-size: 11px; margin-top: 5px; display: none; }
-.url-msg.err { color: var(--red); }
-.url-msg.ok  { color: var(--green); }
-
-.modal-footer { display: flex; gap: 8px; margin-top: 22px; }
-.modal-footer button {
-  flex: 1; padding: 13px; border-radius: var(--r-sm); font-size: 14px; font-weight: 600;
-  cursor: pointer; font-family: 'DM Sans', sans-serif; border: 1px solid var(--border);
-  background: var(--bg2); color: var(--text); transition: all 0.15s;
-}
-.modal-footer button:active { transform: scale(0.97); }
-.modal-footer button.primary { background: var(--accent); color: var(--surface); border-color: var(--accent); }
-.modal-footer button.del { background: var(--red); color: #fff; border-color: var(--red); }
-
-/* ── SATISFACTION ── */
-.sat-row { display: flex; gap: 6px; margin-top: 10px; }
-.sat-star { font-size: 22px; cursor: pointer; transition: transform 0.1s; opacity: 0.35; }
-.sat-star.on { opacity: 1; }
-.sat-star:active { transform: scale(1.25); }
-
-/* ── TOAST ── */
-.toast {
-  position: fixed; bottom: calc(82px + var(--safe-b)); left: 50%; transform: translateX(-50%) translateY(10px);
-  background: var(--accent); color: var(--surface); padding: 10px 20px; border-radius: 24px;
-  font-size: 13px; font-weight: 500; z-index: 400; opacity: 0; transition: all 0.28s;
-  white-space: nowrap; pointer-events: none;
-}
-.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-/* ── INSTALL BANNER ── */
-.install-banner {
-  background: var(--gold-lt); border: 1px solid var(--gold); border-radius: var(--r);
-  padding: 12px 14px; margin-bottom: 14px; display: flex; align-items: center; gap: 12px;
-}
-.install-icon { font-size: 24px; flex-shrink: 0; }
-.install-txt { flex: 1; font-size: 12px; color: var(--text2); line-height: 1.5; }
-.install-txt strong { color: var(--text); }
-.install-btn {
-  padding: 7px 13px; background: var(--gold); color: #fff; border: none;
-  border-radius: var(--r-sm); font-size: 12px; font-weight: 600; cursor: pointer;
-  font-family: 'DM Sans', sans-serif; white-space: nowrap; flex-shrink: 0;
-}
-.install-close { padding: 4px; background: none; border: none; cursor: pointer; color: var(--text3); font-size: 16px; }
-
-/* ── EMPTY ── */
-.empty { text-align: center; padding: 48px 20px; color: var(--text3); }
-.empty-icon { font-size: 44px; margin-bottom: 10px; }
-.empty-txt { font-size: 13px; }
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html{height:100%;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100%;overscroll-behavior:none;-webkit-font-smoothing:antialiased;}
+.app{max-width:430px;margin:0 auto;min-height:100dvh;display:flex;flex-direction:column;}
+.status-bar-spacer{height:var(--safe-t);background:var(--bg);}
+.topbar{padding:10px 20px 6px;display:flex;align-items:center;justify-content:space-between;background:var(--bg);position:sticky;top:0;z-index:40;border-bottom:1px solid var(--border2);}
+.logo{font-family:'DM Serif Display',serif;font-size:20px;letter-spacing:-0.3px;}
+.logo em{color:var(--gold);font-style:normal;}
+.topbar-right{display:flex;align-items:center;gap:8px;}
+.topbar-date{font-size:11px;color:var(--text3);}
+.sync-dot{width:7px;height:7px;border-radius:50%;background:var(--text3);flex-shrink:0;transition:background 0.3s;}
+.sync-dot.syncing{background:var(--gold);animation:pulse 1s infinite;}
+.sync-dot.ok{background:var(--green);}
+.sync-dot.err{background:var(--red);}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.content{flex:1;overflow-y:auto;padding:16px 18px calc(80px + var(--safe-b));}
+.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:rgba(253,252,250,0.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid var(--border);display:flex;z-index:50;padding-bottom:var(--safe-b);}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;padding:9px 4px 6px;border:none;background:none;cursor:pointer;gap:3px;color:var(--text3);font-family:'DM Sans',sans-serif;font-size:10px;font-weight:500;transition:color 0.15s;position:relative;}
+.nav-btn.active{color:var(--text);}
+.nav-btn.active::after{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:24px;height:2px;background:var(--gold);border-radius:0 0 2px 2px;}
+.nav-icon{font-size:22px;line-height:1;}
+.screen{display:none;animation:fadeIn 0.18s ease;}
+.screen.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:12px;}
+.card-label{font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);margin-bottom:11px;}
+.greeting-wrap{padding:4px 0 16px;}
+.greeting{font-family:'DM Serif Display',serif;font-size:24px;line-height:1.25;}
+.greeting-sub{font-size:12px;color:var(--text3);margin-top:4px;}
+.schedule-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:14px;}
+.sched-btn{padding:9px 6px;border:1px solid var(--border);border-radius:var(--r-sm);background:var(--bg2);font-size:12px;cursor:pointer;color:var(--text2);font-family:'DM Sans',sans-serif;font-weight:500;transition:all 0.15s;text-align:center;}
+.sched-btn:active{transform:scale(0.97);}
+.sched-btn.selected{background:var(--accent);color:var(--surface);border-color:var(--accent);}
+.formal-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;}
+.formal-header .lbl{font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);}
+.formal-header .num{font-size:18px;font-weight:600;font-family:'DM Serif Display',serif;}
+input[type=range]{-webkit-appearance:none;width:100%;height:2px;border-radius:1px;background:linear-gradient(to right,var(--gold) calc((var(--val,3)-1)/4*100%),var(--border) calc((var(--val,3)-1)/4*100%));outline:none;cursor:pointer;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--surface);cursor:pointer;border:2px solid var(--gold);box-shadow:0 1px 6px rgba(0,0,0,0.15);}
+.formal-ends{display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-top:5px;}
+.recommend-btn{width:100%;padding:15px;background:var(--accent);color:var(--surface);border:none;border-radius:var(--r);font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity 0.15s;display:flex;align-items:center;justify-content:center;gap:8px;}
+.recommend-btn:active{opacity:0.82;}
+.result-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-top:14px;}
+.result-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+.result-title{font-family:'DM Serif Display',serif;font-size:18px;}
+.score-badge{background:var(--gold);color:#fff;border-radius:20px;padding:3px 11px;font-size:11px;font-weight:600;}
+.coord-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:13px;}
+.coord-cell{border-radius:var(--r-sm);overflow:hidden;background:var(--bg2);}
+.coord-cell img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block;}
+.coord-ph{width:100%;aspect-ratio:3/4;display:flex;align-items:center;justify-content:center;}
+.coord-swatch{width:40px;height:40px;border-radius:8px;border:1px solid rgba(0,0,0,0.08);}
+.coord-meta{padding:6px 8px;}
+.coord-cat{font-size:9px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);}
+.coord-name{font-size:11px;font-weight:600;margin-top:2px;line-height:1.3;}
+.coord-days{font-size:10px;color:var(--gold);font-weight:600;margin-top:2px;}
+.reasons{font-size:12px;color:var(--text2);line-height:1.85;margin-bottom:13px;}
+.reasons strong{color:var(--text);}
+.result-btns{display:flex;gap:8px;}
+.result-btns button{flex:1;padding:11px;border-radius:var(--r-sm);font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;border:1px solid var(--border);background:var(--bg2);color:var(--text);}
+.result-btns button:active{transform:scale(0.97);}
+.result-btns button.primary{background:var(--accent);color:var(--surface);border-color:var(--accent);}
+.wb-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+.screen-title{font-family:'DM Serif Display',serif;font-size:22px;}
+.add-fab{padding:8px 16px;background:var(--accent);color:var(--surface);border:none;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.add-fab:active{opacity:0.8;}
+.cat-tabs{display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px;}
+.cat-tabs::-webkit-scrollbar{display:none;}
+.cat-tab{padding:5px 14px;border:1px solid var(--border);border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;background:var(--surface);color:var(--text2);font-family:'DM Sans',sans-serif;white-space:nowrap;}
+.cat-tab.active{background:var(--accent);color:var(--surface);border-color:var(--accent);}
+.clothes-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}
+.cloth-card{background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);overflow:hidden;cursor:pointer;}
+.cloth-card:active{transform:scale(0.98);border-color:var(--gold);}
+.cloth-photo{width:100%;aspect-ratio:3/4;object-fit:cover;display:block;}
+.cloth-ph{width:100%;aspect-ratio:3/4;display:flex;align-items:center;justify-content:center;}
+.cloth-info{padding:10px 12px 12px;border-top:1px solid var(--border2);}
+.cloth-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cloth-meta{font-size:11px;color:var(--text3);margin-top:2px;}
+.cloth-scores{display:flex;gap:5px;margin-top:6px;flex-wrap:wrap;}
+.sc{font-size:10px;color:var(--text3);background:var(--bg3);padding:2px 7px;border-radius:4px;font-weight:500;}
+.cloth-tap-hint{font-size:10px;color:var(--gold);margin-top:5px;font-weight:500;}
+.history-list{display:flex;flex-direction:column;gap:8px;}
+.hist-item{background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);padding:14px;}
+.hist-top{display:flex;justify-content:space-between;margin-bottom:5px;}
+.hist-date{font-size:11px;color:var(--text3);}
+.hist-sched{font-size:11px;font-weight:600;color:var(--gold);}
+.hist-coord{font-size:13px;font-weight:500;margin-bottom:5px;line-height:1.4;}
+.hist-note{font-size:11px;color:var(--text2);margin-top:4px;font-style:italic;}
+.stars{font-size:13px;letter-spacing:1px;}
+.modal-bg{position:fixed;inset:0;background:rgba(28,26,23,0.5);z-index:200;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);opacity:0;transition:opacity 0.22s;pointer-events:none;}
+.modal-bg.open{opacity:1;pointer-events:auto;}
+.modal-sheet{background:var(--surface);border-radius:var(--r) var(--r) 0 0;width:100%;max-width:430px;max-height:93dvh;overflow-y:auto;padding:0 20px calc(24px + var(--safe-b));transform:translateY(100%);transition:transform 0.26s cubic-bezier(0.32,0.72,0,1);-webkit-overflow-scrolling:touch;}
+.modal-bg.open .modal-sheet{transform:translateY(0);}
+.modal-handle-wrap{position:sticky;top:0;background:var(--surface);padding:12px 0 0;z-index:1;margin-bottom:4px;}
+.modal-handle{width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 14px;}
+.modal-title{font-family:'DM Serif Display',serif;font-size:20px;margin-bottom:18px;}
+.f-label{font-size:10px;font-weight:600;letter-spacing:0.09em;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:6px;}
+.f-input,.f-select{width:100%;padding:11px 13px;border:1px solid var(--border);border-radius:var(--r-sm);background:var(--bg);color:var(--text);font-size:14px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color 0.15s;appearance:none;}
+.f-input:focus,.f-select:focus{border-color:var(--gold);}
+.f-row{margin-bottom:14px;}
+.f-row-2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.f-slider-row{display:flex;align-items:center;gap:10px;}
+.f-slider-row input[type=range]{flex:1;}
+.f-slider-val{font-family:'DM Serif Display',serif;font-size:18px;min-width:22px;text-align:right;}
+.photo-area{width:100%;aspect-ratio:4/3;border:2px dashed var(--border);border-radius:var(--r);background:var(--bg2);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;position:relative;overflow:hidden;margin-bottom:8px;}
+.photo-area img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:calc(var(--r) - 2px);}
+.photo-area .ph-icon{font-size:30px;pointer-events:none;}
+.photo-area .ph-txt{font-size:12px;color:var(--text3);pointer-events:none;}
+.photo-btns{display:flex;gap:7px;margin-bottom:8px;}
+.photo-btn{flex:1;padding:9px 6px;border:1px solid var(--border);border-radius:var(--r-sm);background:var(--bg);font-size:12px;font-weight:500;cursor:pointer;color:var(--text2);font-family:'DM Sans',sans-serif;text-align:center;}
+.photo-btn.danger{color:var(--red);border-color:#f0d0cc;background:#fdf5f4;}
+input[type=file].hidden{display:none;}
+.url-wrap{display:flex;gap:6px;margin-top:6px;}
+.url-wrap input{flex:1;font-size:13px;}
+.url-go{padding:11px 14px;border:1px solid var(--gold);border-radius:var(--r-sm);background:var(--surface);font-size:12px;font-weight:600;cursor:pointer;color:var(--gold);font-family:'DM Sans',sans-serif;white-space:nowrap;}
+.url-go:active{background:var(--gold);color:#fff;}
+.url-msg{font-size:11px;margin-top:5px;display:none;}
+.url-msg.err{color:var(--red);}
+.url-msg.ok{color:var(--green);}
+.modal-footer{display:flex;gap:8px;margin-top:22px;}
+.modal-footer button{flex:1;padding:13px;border-radius:var(--r-sm);font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;border:1px solid var(--border);background:var(--bg2);color:var(--text);}
+.modal-footer button:active{transform:scale(0.97);}
+.modal-footer button.primary{background:var(--accent);color:var(--surface);border-color:var(--accent);}
+.modal-footer button.del{background:var(--red);color:#fff;border-color:var(--red);}
+.sat-row{display:flex;gap:6px;margin-top:10px;}
+.sat-star{font-size:28px;cursor:pointer;opacity:0.3;}
+.sat-star.on{opacity:1;}
+.install-banner{background:var(--gold-lt);border:1px solid var(--gold);border-radius:var(--r);padding:12px 14px;margin-bottom:14px;display:flex;align-items:center;gap:12px;}
+.install-icon{font-size:24px;flex-shrink:0;}
+.install-txt{flex:1;font-size:12px;color:var(--text2);line-height:1.5;}
+.install-txt strong{color:var(--text);}
+.install-btn{padding:7px 13px;background:var(--gold);color:#fff;border:none;border-radius:var(--r-sm);font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;}
+.install-close{padding:4px;background:none;border:none;cursor:pointer;color:var(--text3);font-size:16px;}
+.loading-overlay{position:fixed;inset:0;background:var(--bg);z-index:500;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;transition:opacity 0.4s;}
+.loading-overlay.hidden{opacity:0;pointer-events:none;}
+.loading-logo{font-family:'DM Serif Display',serif;font-size:28px;}
+.loading-logo em{color:var(--gold);font-style:normal;}
+.spinner{width:28px;height:28px;border:2px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin 0.7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.toast{position:fixed;bottom:calc(82px + var(--safe-b));left:50%;transform:translateX(-50%) translateY(10px);background:var(--accent);color:var(--surface);padding:10px 20px;border-radius:24px;font-size:13px;font-weight:500;z-index:400;opacity:0;transition:all 0.28s;white-space:nowrap;pointer-events:none;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.empty{text-align:center;padding:48px 20px;color:var(--text3);}
+.empty-icon{font-size:44px;margin-bottom:10px;}
+.empty-txt{font-size:13px;}
 </style>
 </head>
 <body>
+
+<div class="loading-overlay" id="loading">
+  <div class="loading-logo">Tone<em>Shift</em></div>
+  <div class="spinner"></div>
+</div>
+
 <div class="app">
   <div class="status-bar-spacer"></div>
   <div class="topbar">
     <div class="logo">Tone<em>Shift</em></div>
     <div class="topbar-right">
       <div class="topbar-date" id="hdr-date"></div>
+      <span class="sync-dot" id="sync-dot"></span>
     </div>
   </div>
 
-  <div class="content" id="main-content">
-
-    <!-- ── HOME ── -->
+  <div class="content">
+    <!-- HOME -->
     <div class="screen active" id="screen-home">
       <div class="greeting-wrap">
-        <div class="greeting" id="greeting-txt">今日、何を着る？</div>
+        <div class="greeting">今日、何を着る？</div>
         <div class="greeting-sub" id="greeting-sub"></div>
       </div>
-
-      <div id="install-banner" style="display:none;" class="install-banner">
+      <div id="install-banner" style="display:none" class="install-banner">
         <div class="install-icon">📲</div>
-        <div class="install-txt"><strong>ホーム画面に追加</strong>すると<br>アプリとして使えます</div>
+        <div class="install-txt"><strong>ホーム画面に追加</strong>するとアプリとして使えます</div>
         <button class="install-btn" id="install-btn">追加</button>
         <button class="install-close" onclick="dismissInstall()">×</button>
       </div>
-
       <div class="card">
         <div class="card-label">今日の予定</div>
         <div class="schedule-grid">
@@ -354,21 +205,19 @@ input[type=file].hidden { display: none; }
           <span class="lbl">フォーマル度</span>
           <span class="num" id="formal-num">3</span>
         </div>
-        <input type="range" min="1" max="5" value="3" step="1" id="formal-range"
-          oninput="onFormalInput(this)">
+        <input type="range" min="1" max="5" value="3" step="1" id="formal-range" oninput="onFormalInput(this)">
         <div class="formal-ends"><span>カジュアル</span><span>フォーマル</span></div>
       </div>
-
       <button class="recommend-btn" onclick="recommend()">
-        <span>今日のコーデを提案</span><span style="font-size:16px;">→</span>
+        <span>今日のコーデを提案</span><span style="font-size:16px">→</span>
       </button>
       <div id="result-area"></div>
     </div>
 
-    <!-- ── WARDROBE ── -->
+    <!-- WARDROBE -->
     <div class="screen" id="screen-wardrobe">
       <div class="wb-header">
-        <div class="screen-title">ワードローブ</div>
+        <div class="screen-title" id="wb-title">ワードローブ</div>
         <button class="add-fab" onclick="openModal(null)">＋ 追加</button>
       </div>
       <div class="cat-tabs">
@@ -380,145 +229,77 @@ input[type=file].hidden { display: none; }
       <div class="clothes-grid" id="clothes-grid"></div>
     </div>
 
-    <!-- ── HISTORY ── -->
+    <!-- HISTORY -->
     <div class="screen" id="screen-history">
-      <div class="screen-title" style="margin-bottom:14px;">着用履歴</div>
+      <div class="screen-title" style="margin-bottom:14px">着用履歴</div>
       <div class="history-list" id="history-list"></div>
     </div>
-
-  </div><!-- /content -->
+  </div>
 
   <nav class="nav">
-    <button class="nav-btn active" onclick="switchTab('home')" data-tab="home">
-      <span class="nav-icon">☀️</span>ホーム
-    </button>
-    <button class="nav-btn" onclick="switchTab('wardrobe')" data-tab="wardrobe">
-      <span class="nav-icon">👔</span>ワードローブ
-    </button>
-    <button class="nav-btn" onclick="switchTab('history')" data-tab="history">
-      <span class="nav-icon">📋</span>履歴
-    </button>
+    <button class="nav-btn active" onclick="switchTab('home')" data-tab="home"><span class="nav-icon">☀️</span>ホーム</button>
+    <button class="nav-btn" onclick="switchTab('wardrobe')" data-tab="wardrobe"><span class="nav-icon">👔</span>ワードローブ</button>
+    <button class="nav-btn" onclick="switchTab('history')" data-tab="history"><span class="nav-icon">📋</span>履歴</button>
   </nav>
-</div><!-- /app -->
+</div>
 
-<!-- ── MODAL SHEET ── -->
+<!-- ADD/EDIT MODAL -->
 <div class="modal-bg" id="modal-bg" onclick="onBgClick(event)">
-  <div class="modal-sheet" id="modal-sheet">
-    <div class="modal-handle-wrap">
-      <div class="modal-handle"></div>
-    </div>
+  <div class="modal-sheet">
+    <div class="modal-handle-wrap"><div class="modal-handle"></div></div>
     <div class="modal-title" id="modal-title">服を追加</div>
-
-    <!-- Photo -->
     <div class="f-row">
       <label class="f-label">写真</label>
       <div class="photo-area" id="photo-area">
         <div class="ph-icon">📷</div>
         <div class="ph-txt">写真を追加</div>
-        <img id="photo-preview" style="display:none;" onerror="onImgErr()">
+        <img id="photo-preview" style="display:none" onerror="onImgErr()">
       </div>
       <div class="photo-btns">
-        <label class="photo-btn">
-          📁 ファイル選択
-          <input type="file" accept="image/*" class="hidden" id="file-input" onchange="onFileChosen(event)">
-        </label>
+        <label class="photo-btn">📁 ファイル選択<input type="file" accept="image/*" class="hidden" id="file-input" onchange="onFileChosen(event)"></label>
         <button class="photo-btn" onclick="toggleUrlPane()">🔗 URL入力</button>
-        <button class="photo-btn danger" id="photo-del-btn" onclick="clearPhoto()" style="display:none;">✕ 削除</button>
+        <button class="photo-btn danger" id="photo-del-btn" onclick="clearPhoto()" style="display:none">✕ 削除</button>
       </div>
-      <div id="url-pane" style="display:none;">
+      <div id="url-pane" style="display:none">
         <div class="url-wrap">
           <input class="f-input" type="url" id="url-input" placeholder="https://... 画像URL">
           <button class="url-go" onclick="loadUrl()">確認</button>
         </div>
         <div class="url-msg err" id="url-err">読み込めませんでした。URLを確認してください。</div>
-        <div class="url-msg ok"  id="url-ok">✓ 画像を確認しました</div>
+        <div class="url-msg ok" id="url-ok">✓ 画像を確認しました</div>
       </div>
     </div>
-
     <div class="f-row-2">
-      <div>
-        <label class="f-label">カテゴリ</label>
-        <select class="f-select" id="f-cat">
-          <option>ジャケット</option><option>シャツ</option><option>パンツ</option>
-        </select>
-      </div>
-      <div>
-        <label class="f-label">色</label>
-        <input class="f-input" type="text" id="f-color" placeholder="ネイビー">
-      </div>
+      <div><label class="f-label">カテゴリ</label><select class="f-select" id="f-cat"><option>ジャケット</option><option>シャツ</option><option>パンツ</option></select></div>
+      <div><label class="f-label">色</label><input class="f-input" type="text" id="f-color" placeholder="ネイビー"></div>
     </div>
-
-    <div class="f-row">
-      <label class="f-label">名前・メモ</label>
-      <input class="f-input" type="text" id="f-name" placeholder="テーラードジャケット">
-    </div>
-
+    <div class="f-row"><label class="f-label">名前・メモ</label><input class="f-input" type="text" id="f-name" placeholder="テーラードジャケット"></div>
     <div class="f-row-2">
-      <div>
-        <label class="f-label">季節</label>
-        <select class="f-select" id="f-season">
-          <option>春秋</option><option>夏</option><option>冬</option><option>通年</option>
-        </select>
-      </div>
-      <div>
-        <label class="f-label">着用間隔（日）</label>
-        <input class="f-input" type="number" id="f-interval" value="7" min="1" max="60">
-      </div>
+      <div><label class="f-label">季節</label><select class="f-select" id="f-season"><option>春秋</option><option>夏</option><option>冬</option><option>通年</option></select></div>
+      <div><label class="f-label">着用間隔（日）</label><input class="f-input" type="number" id="f-interval" value="7" min="1" max="60"></div>
     </div>
-
-    <div class="f-row">
-      <label class="f-label">フォーマル度 <span id="sv-formal">3</span> / 5</label>
-      <div class="f-slider-row">
-        <input type="range" min="1" max="5" value="3" step="1" id="f-formal"
-          oninput="setSV('formal',this.value)">
-        <span class="f-slider-val" id="sv-formal-big">3</span>
-      </div>
-    </div>
-    <div class="f-row">
-      <label class="f-label">攻め度 <span id="sv-attack">3</span> / 5</label>
-      <div class="f-slider-row">
-        <input type="range" min="1" max="5" value="3" step="1" id="f-attack"
-          oninput="setSV('attack',this.value)">
-        <span class="f-slider-val" id="sv-attack-big">3</span>
-      </div>
-    </div>
-    <div class="f-row">
-      <label class="f-label">お気に入り度 <span id="sv-fav">3</span> / 5</label>
-      <div class="f-slider-row">
-        <input type="range" min="1" max="5" value="3" step="1" id="f-fav"
-          oninput="setSV('fav',this.value)">
-        <span class="f-slider-val" id="sv-fav-big">3</span>
-      </div>
-    </div>
-    <div class="f-row">
-      <label class="f-label">着心地 <span id="sv-comfort">3</span> / 5</label>
-      <div class="f-slider-row">
-        <input type="range" min="1" max="5" value="3" step="1" id="f-comfort"
-          oninput="setSV('comfort',this.value)">
-        <span class="f-slider-val" id="sv-comfort-big">3</span>
-      </div>
-    </div>
-
+    <div class="f-row"><label class="f-label">フォーマル度 <span id="sv-formal">3</span>/5</label><div class="f-slider-row"><input type="range" min="1" max="5" value="3" step="1" id="f-formal" oninput="setSV('formal',this.value)"><span class="f-slider-val" id="sv-formal-big">3</span></div></div>
+    <div class="f-row"><label class="f-label">攻め度 <span id="sv-attack">3</span>/5</label><div class="f-slider-row"><input type="range" min="1" max="5" value="3" step="1" id="f-attack" oninput="setSV('attack',this.value)"><span class="f-slider-val" id="sv-attack-big">3</span></div></div>
+    <div class="f-row"><label class="f-label">お気に入り度 <span id="sv-fav">3</span>/5</label><div class="f-slider-row"><input type="range" min="1" max="5" value="3" step="1" id="f-fav" oninput="setSV('fav',this.value)"><span class="f-slider-val" id="sv-fav-big">3</span></div></div>
+    <div class="f-row"><label class="f-label">着心地 <span id="sv-comfort">3</span>/5</label><div class="f-slider-row"><input type="range" min="1" max="5" value="3" step="1" id="f-comfort" oninput="setSV('comfort',this.value)"><span class="f-slider-val" id="sv-comfort-big">3</span></div></div>
     <div class="modal-footer" id="modal-footer"></div>
   </div>
 </div>
 
-<div class="toast" id="toast"></div>
-
-<!-- ── SATISFACTION MODAL ── -->
+<!-- SATISFACTION MODAL -->
 <div class="modal-bg" id="sat-bg">
-  <div class="modal-sheet" style="padding-bottom:32px;">
+  <div class="modal-sheet" style="padding-bottom:32px">
     <div class="modal-handle-wrap"><div class="modal-handle"></div></div>
     <div class="modal-title">今日のコーデ、どうでしたか？</div>
-    <div style="font-size:13px;color:var(--text2);margin-bottom:12px;">着用を記録しました。満足度を教えてください。</div>
+    <div style="font-size:13px;color:var(--text2);margin-bottom:12px">満足度を教えてください。</div>
     <div class="sat-row" id="sat-stars">
-      <span class="sat-star" data-v="1" onclick="pickSat(1)">★</span>
-      <span class="sat-star" data-v="2" onclick="pickSat(2)">★</span>
-      <span class="sat-star" data-v="3" onclick="pickSat(3)">★</span>
-      <span class="sat-star" data-v="4" onclick="pickSat(4)">★</span>
-      <span class="sat-star" data-v="5" onclick="pickSat(5)">★</span>
+      <span class="sat-star on" data-v="1" onclick="pickSat(1)">★</span>
+      <span class="sat-star on" data-v="2" onclick="pickSat(2)">★</span>
+      <span class="sat-star on" data-v="3" onclick="pickSat(3)">★</span>
+      <span class="sat-star on" data-v="4" onclick="pickSat(4)">★</span>
+      <span class="sat-star on" data-v="5" onclick="pickSat(5)">★</span>
     </div>
-    <div class="f-row" style="margin-top:14px;">
+    <div class="f-row" style="margin-top:14px">
       <label class="f-label">メモ（任意）</label>
       <input class="f-input" type="text" id="sat-note" placeholder="商談うまくいった、など">
     </div>
@@ -529,481 +310,313 @@ input[type=file].hidden { display: none; }
   </div>
 </div>
 
+<div class="toast" id="toast"></div>
+
 <script>
-// ══════════════════════════════════════════════
-//  CONSTANTS & STATE
-// ══════════════════════════════════════════════
-const LS_CLOTHES  = 'ts_clothes_v1';
-const LS_HISTORY  = 'ts_history_v1';
-const LS_INSTALL  = 'ts_install_dismissed';
+// ═══════════════════════════════════════
+//  SUPABASE
+// ═══════════════════════════════════════
+const SB_URL = 'https://qmeyprtrwuikyhbolqzd.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFtZXlwcnRyd3Vpa3loYm9scXpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2NjM1OTksImV4cCI6MjA5NDIzOTU5OX0.DTYmweRmXWU4e_ClVwswIkjy7BqpzN5KyJpQMZ6oHJ4';
 
-const COLOR_MAP = {
-  'ネイビー':'#1B2A4A','ブルー':'#3B82C4','ライトブルー':'#7EB8D4','インディゴ':'#3730A3',
-  'グレー':'#888','ライトグレー':'#C0BEB7','ダークグレー':'#555','チャコール':'#4A4A4A',
-  'ホワイト':'#F5F5F0','オフホワイト':'#F0EDE6','アイボリー':'#E8E3D5',
-  'ブラック':'#2C2C2A','ベージュ':'#C8B89A','ブラウン':'#7A5C44','キャメル':'#B07D3A',
-  'グリーン':'#3B6D11','カーキ':'#7A7A4A','オリーブ':'#6B6B2A',
-  'ワイン':'#7A1F2E','バーガンディ':'#6B1F2E','レッド':'#C0392B','テラコッタ':'#B85C38',
-};
-function colorHex(c){ for(const k in COLOR_MAP){ if(c&&c.includes(k)) return COLOR_MAP[k]; } return '#A09D97'; }
+function getDeviceId() {
+  let id = localStorage.getItem('ts_device_id');
+  if (!id) { id = 'dev_' + Math.random().toString(36).slice(2) + Date.now().toString(36); localStorage.setItem('ts_device_id', id); }
+  return id;
+}
+const DEVICE_ID = getDeviceId();
 
-const DEFAULT_CLOTHES = [
-  {id:1,category:'ジャケット',name:'テーラードジャケット',color:'ネイビー',season:'春秋',formal:4,attack:2,fav:5,comfort:4,interval:7,lastWorn:daysAgo(3),photo:null},
-  {id:2,category:'ジャケット',name:'ニットジャケット',color:'グレー',season:'春秋',formal:3,attack:3,fav:4,comfort:5,interval:5,lastWorn:daysAgo(10),photo:null},
-  {id:3,category:'シャツ',name:'オックスフォードシャツ',color:'ホワイト',season:'通年',formal:4,attack:1,fav:4,comfort:4,interval:3,lastWorn:daysAgo(1),photo:null},
-  {id:4,category:'シャツ',name:'ライトブルーシャツ',color:'ライトブルー',season:'春秋',formal:3,attack:2,fav:5,comfort:4,interval:4,lastWorn:daysAgo(6),photo:null},
-  {id:5,category:'パンツ',name:'スラックス',color:'チャコール',season:'通年',formal:4,attack:1,fav:4,comfort:4,interval:5,lastWorn:daysAgo(2),photo:null},
-  {id:6,category:'パンツ',name:'テーパードパンツ',color:'ネイビー',season:'春秋',formal:3,attack:3,fav:5,comfort:4,interval:5,lastWorn:daysAgo(8),photo:null},
-];
-
-let clothes  = loadLS(LS_CLOTHES)  || JSON.parse(JSON.stringify(DEFAULT_CLOTHES));
-let history  = loadLS(LS_HISTORY)  || [];
-let nextId   = Math.max(0, ...clothes.map(c=>c.id)) + 1;
-
-let currentCat = 'all';
-let selSchedule = '社内勤務';
-let editingId   = null;
-let pendingPhoto = null;
-let pendingSatEntry = null;
-let deferredInstall = null;
-
-// ══════════════════════════════════════════════
-//  STORAGE
-// ══════════════════════════════════════════════
-function loadLS(key){ try{ const d=localStorage.getItem(key); return d?JSON.parse(d):null; }catch(e){ return null; } }
-function saveLS(key,val){ try{ localStorage.setItem(key,JSON.stringify(val)); }catch(e){ console.warn('Storage full',e); } }
-function saveAll(){ saveLS(LS_CLOTHES,clothes); saveLS(LS_HISTORY,history); }
-
-// ══════════════════════════════════════════════
-//  UTILS
-// ══════════════════════════════════════════════
-function daysAgo(n){ const d=new Date(); d.setDate(d.getDate()-n); return d.toISOString().split('T')[0]; }
-function daysSince(s){ if(!s) return 99; return Math.floor((Date.now()-new Date(s).getTime())/86400000); }
-function today(){ return new Date().toISOString().split('T')[0]; }
-
-function showToast(msg){
-  const t=document.getElementById('toast');
-  t.textContent=msg; t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'), 2300);
+async function sb(path, method = 'GET', body = null) {
+  const res = await fetch(SB_URL + '/rest/v1/' + path, {
+    method,
+    headers: {
+      'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY,
+      'Content-Type': 'application/json',
+      'Prefer': method === 'POST' ? 'return=representation' : ''
+    },
+    body: body ? JSON.stringify(body) : null
+  });
+  if (!res.ok) throw new Error(await res.text());
+  const t = await res.text();
+  return t ? JSON.parse(t) : [];
 }
 
-// ══════════════════════════════════════════════
+// DB変換
+function toDbCloth(c) {
+  return { device_id: DEVICE_ID, category: c.category, name: c.name, color: c.color, season: c.season, formal: c.formal, attack: c.attack, fav: c.fav, comfort: c.comfort, interval_days: c.interval, last_worn: c.lastWorn || null, photo_url: c.photo || null };
+}
+function fromDbCloth(r) {
+  return { dbId: r.id, category: r.category, name: r.name, color: r.color || '', season: r.season || '通年', formal: r.formal || 3, attack: r.attack || 3, fav: r.fav || 3, comfort: r.comfort || 3, interval: r.interval_days || 7, lastWorn: r.last_worn || null, photo: r.photo_url || null };
+}
+function toDbHist(h) {
+  return { device_id: DEVICE_ID, worn_date: h.date, schedule_type: h.schedule, jacket_name: h.jacket, shirt_name: h.shirt, pants_name: h.pants, formal_level: h.formal, satisfaction: h.satisfaction, note: h.note || '' };
+}
+function fromDbHist(r) {
+  return { date: r.worn_date, schedule: r.schedule_type, jacket: r.jacket_name, shirt: r.shirt_name, pants: r.pants_name, formal: r.formal_level, satisfaction: r.satisfaction || 5, note: r.note || '' };
+}
+
+async function fetchClothes() { return (await sb(`clothes?device_id=eq.${DEVICE_ID}&order=created_at.asc`)).map(fromDbCloth); }
+async function fetchHistory() { return (await sb(`wear_history?device_id=eq.${DEVICE_ID}&order=worn_date.desc&limit=60`)).map(fromDbHist); }
+async function insertCloth(c) { const r = await sb('clothes', 'POST', toDbCloth(c)); return r[0] ? fromDbCloth(r[0]) : null; }
+async function updateCloth(c) { await sb(`clothes?id=eq.${c.dbId}`, 'PATCH', toDbCloth(c)); }
+async function deleteCloth(dbId) { await sb(`clothes?id=eq.${dbId}`, 'DELETE'); }
+async function insertHist(h) { await sb('wear_history', 'POST', toDbHist(h)); }
+
+// ═══════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════
+const COLOR_MAP = { 'ネイビー': '#1B2A4A', 'ブルー': '#3B82C4', 'ライトブルー': '#7EB8D4', 'インディゴ': '#3730A3', 'グレー': '#888', 'ライトグレー': '#C0BEB7', 'ダークグレー': '#555', 'チャコール': '#4A4A4A', 'ホワイト': '#F5F5F0', 'オフホワイト': '#F0EDE6', 'アイボリー': '#E8E3D5', 'ブラック': '#2C2C2A', 'ベージュ': '#C8B89A', 'ブラウン': '#7A5C44', 'キャメル': '#B07D3A', 'グリーン': '#3B6D11', 'カーキ': '#7A7A4A', 'オリーブ': '#6B6B2A', 'ワイン': '#7A1F2E', 'レッド': '#C0392B', 'テラコッタ': '#B85C38' };
+function colorHex(c) { for (const k in COLOR_MAP) { if (c && c.includes(k)) return COLOR_MAP[k]; } return '#A09D97'; }
+
+let clothes = [], history = [];
+let currentCat = 'all', selSchedule = '社内勤務';
+let editingId = null, pendingPhoto = null, pendingSat = null, deferredInstall = null;
+
+// ═══════════════════════════════════════
+//  UTILS
+// ═══════════════════════════════════════
+function daysAgo(n) { const d = new Date(); d.setDate(d.getDate() - n); return d.toISOString().split('T')[0]; }
+function daysSince(s) { if (!s) return 99; return Math.floor((Date.now() - new Date(s).getTime()) / 86400000); }
+function today() { return new Date().toISOString().split('T')[0]; }
+function esc(s) { return (s || '').replace(/'/g, "\\'"); }
+function setSyncDot(s) { document.getElementById('sync-dot').className = 'sync-dot ' + s; }
+function showToast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2300); }
+
+// ═══════════════════════════════════════
 //  INIT
-// ══════════════════════════════════════════════
-(function init(){
-  // service worker
-  if('serviceWorker' in navigator){
-    navigator.serviceWorker.register('sw.js').catch(()=>{});
+// ═══════════════════════════════════════
+(async function init() {
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+
+  const now = new Date();
+  document.getElementById('hdr-date').textContent = now.toLocaleDateString('ja-JP', { month: 'long', day: 'numeric', weekday: 'short' });
+  const h = now.getHours();
+  document.getElementById('greeting-sub').textContent = h < 12 ? 'おはようございます。今日も一日頑張りましょう。' : h < 17 ? 'こんにちは。今日の予定は？' : 'こんばんは。明日の準備はいかがですか？';
+
+  window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredInstall = e; if (!localStorage.getItem('ts_install_ok')) document.getElementById('install-banner').style.display = 'flex'; });
+  document.getElementById('install-btn').addEventListener('click', async () => { if (!deferredInstall) return; deferredInstall.prompt(); const { outcome } = await deferredInstall.userChoice; if (outcome === 'accepted') dismissInstall(); deferredInstall = null; });
+
+  setSyncDot('syncing');
+  try {
+    [clothes, history] = await Promise.all([fetchClothes(), fetchHistory()]);
+    setSyncDot('ok');
+  } catch (e) {
+    console.error(e);
+    setSyncDot('err');
+    showToast('⚠️ データ読み込みに失敗しました');
   }
 
-  // date & greeting
-  const now = new Date();
-  document.getElementById('hdr-date').textContent =
-    now.toLocaleDateString('ja-JP',{month:'long',day:'numeric',weekday:'short'});
-  const h = now.getHours();
-  document.getElementById('greeting-sub').textContent =
-    h<12 ? 'おはようございます。今日も一日頑張りましょう。'
-    : h<17 ? 'こんにちは。今日の予定は？'
-    : 'こんばんは。明日の準備はいかがですか？';
+  const ld = document.getElementById('loading');
+  ld.classList.add('hidden');
+  setTimeout(() => ld.style.display = 'none', 400);
 
-  // PWA install prompt
-  window.addEventListener('beforeinstallprompt', e => {
-    e.preventDefault(); deferredInstall = e;
-    if(!localStorage.getItem(LS_INSTALL)){
-      document.getElementById('install-banner').style.display='flex';
-    }
-  });
-  document.getElementById('install-btn').addEventListener('click', async ()=>{
-    if(!deferredInstall) return;
-    deferredInstall.prompt();
-    const {outcome} = await deferredInstall.userChoice;
-    if(outcome==='accepted') dismissInstall();
-    deferredInstall = null;
+  document.querySelectorAll('input[type=range]').forEach(r => {
+    r.style.setProperty('--val', r.value);
+    r.addEventListener('input', function () { this.style.setProperty('--val', this.value); });
   });
 })();
 
-function dismissInstall(){
-  localStorage.setItem(LS_INSTALL,'1');
-  document.getElementById('install-banner').style.display='none';
-}
+function dismissInstall() { localStorage.setItem('ts_install_ok', '1'); document.getElementById('install-banner').style.display = 'none'; }
 
-// ══════════════════════════════════════════════
+// ═══════════════════════════════════════
 //  TABS
-// ══════════════════════════════════════════════
-function switchTab(tab){
-  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active', b.dataset.tab===tab));
-  document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('active', s.id==='screen-'+tab));
-  if(tab==='wardrobe') renderWardrobe();
-  if(tab==='history')  renderHistory();
+// ═══════════════════════════════════════
+function switchTab(tab) {
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  document.querySelectorAll('.screen').forEach(s => s.classList.toggle('active', s.id === 'screen-' + tab));
+  if (tab === 'wardrobe') renderWardrobe();
+  if (tab === 'history') renderHistory();
 }
 
-// ══════════════════════════════════════════════
+// ═══════════════════════════════════════
 //  HOME
-// ══════════════════════════════════════════════
-function pickSchedule(btn){
-  document.querySelectorAll('.sched-btn').forEach(b=>b.classList.remove('selected'));
-  btn.classList.add('selected');
-  selSchedule = btn.dataset.val;
-  const map={'社内勤務':2,'顧客訪問':4,'出張':3,'会食':4,'カジュアル外出':1};
-  setFormalSlider(map[selSchedule]||3);
+// ═══════════════════════════════════════
+function pickSchedule(btn) {
+  document.querySelectorAll('.sched-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected'); selSchedule = btn.dataset.val;
+  const m = { '社内勤務': 2, '顧客訪問': 4, '出張': 3, '会食': 4, 'カジュアル外出': 1 };
+  setFormal(m[selSchedule] || 3);
+}
+function onFormalInput(el) { document.getElementById('formal-num').textContent = el.value; el.style.setProperty('--val', el.value); }
+function setFormal(v) { const el = document.getElementById('formal-range'); el.value = v; el.style.setProperty('--val', v); document.getElementById('formal-num').textContent = v; }
+function calcScore(c, ft) { const ds = daysSince(c.lastWorn), fd = Math.abs(c.formal - ft), ad = Math.max(0, c.attack - ft), ib = Math.min(ds / c.interval, 2); return c.formal * 10 + ib * 5 + c.fav * 2 + c.comfort - fd * 8 - ad * 6; }
+
+function thumb(item) {
+  if (item.photo) return `<img src="${item.photo}" style="width:100%;aspect-ratio:3/4;object-fit:cover;display:block" onerror="this.style.display='none'">`;
+  return `<div class="coord-ph" style="background:${colorHex(item.color)}18"><div class="coord-swatch" style="background:${colorHex(item.color)}"></div></div>`;
 }
 
-function onFormalInput(el){
-  document.getElementById('formal-num').textContent = el.value;
-  el.style.setProperty('--val', el.value);
-}
-
-function setFormalSlider(v){
-  const el=document.getElementById('formal-range');
-  el.value=v; el.style.setProperty('--val',v);
-  document.getElementById('formal-num').textContent=v;
-}
-
-function calcScore(item, ft){
-  const ds = daysSince(item.lastWorn);
-  const fd = Math.abs(item.formal - ft);
-  const ad = Math.max(0, item.attack - ft);
-  const ib = Math.min(ds / item.interval, 2);
-  return item.formal*10 + ib*5 + item.fav*2 + item.comfort - fd*8 - ad*6;
-}
-
-function photoThumb(item, cellCls){
-  if(item.photo) return `<img src="${item.photo}" class="${cellCls}-photo" onerror="this.style.display='none'">`;
-  const bg = colorHex(item.color)+'22';
-  const sw = colorHex(item.color);
-  return `<div class="${cellCls}-ph" style="background:${bg}">
-    <div class="coord-swatch" style="background:${sw};border:1px solid rgba(0,0,0,0.1)"></div>
-  </div>`;
-}
-
-function recommend(){
+function recommend() {
   const ft = parseInt(document.getElementById('formal-range').value);
-  const bycat = cat => clothes.filter(c=>c.category===cat);
-  const J=bycat('ジャケット'), S=bycat('シャツ'), P=bycat('パンツ');
-  if(!J.length||!S.length||!P.length){
-    document.getElementById('result-area').innerHTML=
-      `<div class="card" style="text-align:center;color:var(--text3);font-size:13px;padding:24px">
-        ジャケット・シャツ・パンツをそれぞれ登録してください
-      </div>`;
-    return;
-  }
-  const best=arr=>[...arr].sort((a,b)=>calcScore(b,ft)-calcScore(a,ft))[0];
-  const bj=best(J), bs=best(S), bp=best(P);
-  const score=Math.round((calcScore(bj,ft)+calcScore(bs,ft)+calcScore(bp,ft))/3);
-
-  const reasons=[];
-  if(daysSince(bj.lastWorn)>=bj.interval) reasons.push(`<strong>${bj.name}</strong>は${daysSince(bj.lastWorn)}日ぶり`);
-  if(bj.fav>=4) reasons.push(`<strong>${bj.name}</strong>のお気に入り度 ${bj.fav}/5`);
-  if(Math.abs(bj.formal-ft)<=1) reasons.push(`フォーマル度 ${ft} の${selSchedule}にマッチ`);
-  if(!reasons.length) reasons.push(`${selSchedule}向けバランスコーデ`);
-
-  const cell=(item,cat)=>`
-    <div class="coord-cell">
-      ${photoThumb(item,'coord-cell')}
-      <div class="coord-meta">
-        <div class="coord-cat">${cat}</div>
-        <div class="coord-name">${item.name}</div>
-        <div class="coord-days">${daysSince(item.lastWorn)}日ぶり</div>
-      </div>
-    </div>`;
-
-  document.getElementById('result-area').innerHTML=`
+  const J = clothes.filter(c => c.category === 'ジャケット'), S = clothes.filter(c => c.category === 'シャツ'), P = clothes.filter(c => c.category === 'パンツ');
+  if (!J.length || !S.length || !P.length) { document.getElementById('result-area').innerHTML = '<div class="card" style="text-align:center;color:var(--text3);font-size:13px;padding:24px">ジャケット・シャツ・パンツをそれぞれ登録してください</div>'; return; }
+  const best = arr => [...arr].sort((a, b) => calcScore(b, ft) - calcScore(a, ft))[0];
+  const bj = best(J), bs = best(S), bp = best(P);
+  const score = Math.round((calcScore(bj, ft) + calcScore(bs, ft) + calcScore(bp, ft)) / 3);
+  const reasons = [];
+  if (daysSince(bj.lastWorn) >= bj.interval) reasons.push(`<strong>${bj.name}</strong>は${daysSince(bj.lastWorn)}日ぶり`);
+  if (bj.fav >= 4) reasons.push(`<strong>${bj.name}</strong>のお気に入り度 ${bj.fav}/5`);
+  if (Math.abs(bj.formal - ft) <= 1) reasons.push(`フォーマル度 ${ft} の${selSchedule}にマッチ`);
+  if (!reasons.length) reasons.push(`${selSchedule}向けバランスコーデ`);
+  const cell = (item, cat) => `<div class="coord-cell">${thumb(item)}<div class="coord-meta"><div class="coord-cat">${cat}</div><div class="coord-name">${item.name}</div><div class="coord-days">${daysSince(item.lastWorn)}日ぶり</div></div></div>`;
+  document.getElementById('result-area').innerHTML = `
     <div class="result-card">
-      <div class="result-head">
-        <div class="result-title">今日のコーデ</div>
-        <div class="score-badge">SCORE ${score}</div>
-      </div>
-      <div class="coord-grid">
-        ${cell(bj,'Jacket')}${cell(bs,'Shirt')}${cell(bp,'Pants')}
-      </div>
-      <div class="reasons">${reasons.map(r=>'• '+r).join('<br>')}</div>
+      <div class="result-head"><div class="result-title">今日のコーデ</div><div class="score-badge">SCORE ${score}</div></div>
+      <div class="coord-grid">${cell(bj, 'Jacket')}${cell(bs, 'Shirt')}${cell(bp, 'Pants')}</div>
+      <div class="reasons">${reasons.map(r => '• ' + r).join('<br>')}</div>
       <div class="result-btns">
-        <button class="primary" onclick="confirmCoord('${esc(bj.name)}','${esc(bs.name)}','${esc(bp.name)}',${ft})">✓ これに決定</button>
+        <button class="primary" onclick="confirmCoord('${esc(bj.dbId)}','${esc(bs.dbId)}','${esc(bp.dbId)}','${esc(bj.name)}','${esc(bs.name)}','${esc(bp.name)}',${ft})">✓ これに決定</button>
         <button onclick="recommend()">↺ 別案を見る</button>
       </div>
     </div>`;
 }
 
-function esc(s){ return s.replace(/'/g,"\\'"); }
-
-function confirmCoord(jacket,shirt,pants,ft){
-  pendingSatEntry={date:today(),schedule:selSchedule,jacket,shirt,pants,formal:ft,satisfaction:5,note:''};
-  // update lastWorn
-  clothes.forEach(c=>{ if(c.name===jacket||c.name===shirt||c.name===pants) c.lastWorn=today(); });
-  saveAll();
-  // open satisfaction modal
-  document.getElementById('sat-note').value='';
+async function confirmCoord(jId, sId, pId, jacket, shirt, pants, ft) {
+  setSyncDot('syncing');
+  try {
+    const td = today();
+    await Promise.all([jId, sId, pId].map(id => sb(`clothes?id=eq.${id}`, 'PATCH', { last_worn: td })));
+    clothes.forEach(c => { if (c.dbId === jId || c.dbId === sId || c.dbId === pId) c.lastWorn = td; });
+    setSyncDot('ok');
+  } catch (e) { setSyncDot('err'); }
+  pendingSat = { date: today(), schedule: selSchedule, jacket, shirt, pants, formal: ft, satisfaction: 5, note: '' };
+  document.getElementById('sat-note').value = '';
   highlightStars(5);
-  openSat();
-  document.getElementById('result-area').innerHTML=`
-    <div class="result-card" style="text-align:center;padding:20px;">
-      <div style="font-family:'DM Serif Display',serif;font-size:18px;margin-bottom:6px">記録完了 ✓</div>
-      <div style="font-size:12px;color:var(--text3)">今日も素敵な一日を！</div>
-    </div>`;
+  document.getElementById('sat-bg').classList.add('open');
+  document.getElementById('result-area').innerHTML = '<div class="result-card" style="text-align:center;padding:20px"><div style="font-family:\'DM Serif Display\',serif;font-size:18px;margin-bottom:6px">記録完了 ✓</div><div style="font-size:12px;color:var(--text3)">今日も素敵な一日を！</div></div>';
 }
 
-// ══════════════════════════════════════════════
-//  SATISFACTION MODAL
-// ══════════════════════════════════════════════
-function openSat(){ document.getElementById('sat-bg').classList.add('open'); }
-function closeSat(){ document.getElementById('sat-bg').classList.remove('open'); }
-
-function highlightStars(v){
-  document.querySelectorAll('.sat-star').forEach(s=>{
-    s.classList.toggle('on', parseInt(s.dataset.v)<=v);
-  });
-}
-function pickSat(v){
-  if(pendingSatEntry) pendingSatEntry.satisfaction=v;
-  highlightStars(v);
-}
-function saveSat(){
-  if(pendingSatEntry){
-    pendingSatEntry.note = document.getElementById('sat-note').value;
-    history.unshift(pendingSatEntry);
-    saveLS(LS_HISTORY,history);
-    pendingSatEntry=null;
+// ═══════════════════════════════════════
+//  SATISFACTION
+// ═══════════════════════════════════════
+function closeSat() { document.getElementById('sat-bg').classList.remove('open'); }
+function highlightStars(v) { document.querySelectorAll('.sat-star').forEach(s => s.classList.toggle('on', parseInt(s.dataset.v) <= v)); }
+function pickSat(v) { if (pendingSat) pendingSat.satisfaction = v; highlightStars(v); }
+async function saveSat() {
+  if (pendingSat) {
+    pendingSat.note = document.getElementById('sat-note').value;
+    setSyncDot('syncing');
+    try { await insertHist(pendingSat); history.unshift(pendingSat); setSyncDot('ok'); showToast('履歴に保存しました 📋'); } catch (e) { setSyncDot('err'); showToast('⚠️ 保存に失敗しました'); }
+    pendingSat = null;
   }
   closeSat();
-  showToast('履歴に保存しました 📋');
 }
 
-// ══════════════════════════════════════════════
+// ═══════════════════════════════════════
 //  WARDROBE
-// ══════════════════════════════════════════════
-function renderWardrobe(){
-  const list = currentCat==='all' ? clothes : clothes.filter(c=>c.category===currentCat);
-  // update header count
-  const h = document.querySelector('.wb-header .screen-title');
-  if(h) h.textContent = `ワードローブ（${clothes.length}点）`;
-
-  if(!list.length){
-    document.getElementById('clothes-grid').innerHTML=
-      `<div class="empty" style="grid-column:1/-1"><div class="empty-icon">👔</div><div class="empty-txt">服がありません。追加してください。</div></div>`;
-    return;
-  }
-  document.getElementById('clothes-grid').innerHTML = list.map(c=>`
-    <div class="cloth-card" onclick="openModal(${c.id})">
-      ${c.photo
-        ? `<img src="${c.photo}" class="cloth-photo" onerror="this.style.display='none'">`
-        : `<div class="cloth-ph" style="background:${colorHex(c.color)}18">
-            <div style="width:54px;height:54px;border-radius:10px;background:${colorHex(c.color)};border:1px solid rgba(0,0,0,0.08)"></div>
-           </div>`}
+// ═══════════════════════════════════════
+function renderWardrobe() {
+  const list = currentCat === 'all' ? clothes : clothes.filter(c => c.category === currentCat);
+  document.getElementById('wb-title').textContent = `ワードローブ（${clothes.length}点）`;
+  if (!list.length) { document.getElementById('clothes-grid').innerHTML = '<div class="empty" style="grid-column:1/-1"><div class="empty-icon">👔</div><div class="empty-txt">服がありません。追加してください。</div></div>'; return; }
+  document.getElementById('clothes-grid').innerHTML = list.map(c => `
+    <div class="cloth-card" onclick="openModal('${c.dbId}')">
+      ${c.photo ? `<img src="${c.photo}" class="cloth-photo" onerror="this.style.display='none'">` : `<div class="cloth-ph" style="background:${colorHex(c.color)}18"><div style="width:54px;height:54px;border-radius:10px;background:${colorHex(c.color)};border:1px solid rgba(0,0,0,0.08)"></div></div>`}
       <div class="cloth-info">
         <div class="cloth-name">${c.name}</div>
         <div class="cloth-meta">${c.color} · ${c.season} · ${daysSince(c.lastWorn)}日前</div>
-        <div class="cloth-scores">
-          <span class="sc">F${c.formal}</span>
-          <span class="sc">攻${c.attack}</span>
-          <span class="sc">★${c.fav}</span>
-          <span class="sc">着${c.comfort}</span>
-        </div>
+        <div class="cloth-scores"><span class="sc">F${c.formal}</span><span class="sc">攻${c.attack}</span><span class="sc">★${c.fav}</span><span class="sc">着${c.comfort}</span></div>
         <div class="cloth-tap-hint">タップして編集</div>
       </div>
     </div>`).join('');
 }
+function setCat(cat, btn) { currentCat = cat; document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active')); btn.classList.add('active'); renderWardrobe(); }
 
-function setCat(cat,btn){
-  currentCat=cat;
-  document.querySelectorAll('.cat-tab').forEach(t=>t.classList.remove('active'));
-  btn.classList.add('active');
-  renderWardrobe();
-}
-
-// ══════════════════════════════════════════════
+// ═══════════════════════════════════════
 //  HISTORY
-// ══════════════════════════════════════════════
-function renderHistory(){
-  if(!history.length){
-    document.getElementById('history-list').innerHTML=
-      `<div class="empty"><div class="empty-icon">📋</div><div class="empty-txt">履歴がありません。<br>コーデを決定すると記録されます。</div></div>`;
-    return;
-  }
-  document.getElementById('history-list').innerHTML = history.map(h=>`
+// ═══════════════════════════════════════
+async function renderHistory() {
+  setSyncDot('syncing');
+  try { history = await fetchHistory(); setSyncDot('ok'); } catch (e) { setSyncDot('err'); }
+  if (!history.length) { document.getElementById('history-list').innerHTML = '<div class="empty"><div class="empty-icon">📋</div><div class="empty-txt">履歴がありません。</div></div>'; return; }
+  document.getElementById('history-list').innerHTML = history.map(h => `
     <div class="hist-item">
-      <div class="hist-top">
-        <div class="hist-date">${h.date}</div>
-        <div class="hist-sched">${h.schedule}</div>
-      </div>
+      <div class="hist-top"><div class="hist-date">${h.date}</div><div class="hist-sched">${h.schedule}</div></div>
       <div class="hist-coord">${h.jacket}<br>${h.shirt} / ${h.pants}</div>
-      <div class="stars">${'★'.repeat(h.satisfaction)}${'☆'.repeat(5-h.satisfaction)}</div>
-      ${h.note?`<div class="hist-note">${h.note}</div>`:''}
+      <div class="stars">${'★'.repeat(h.satisfaction)}${'☆'.repeat(5 - h.satisfaction)}</div>
+      ${h.note ? `<div class="hist-note">${h.note}</div>` : ''}
     </div>`).join('');
 }
 
-// ══════════════════════════════════════════════
+// ═══════════════════════════════════════
 //  MODAL
-// ══════════════════════════════════════════════
-function openModal(id){
-  editingId=id; pendingPhoto=null;
+// ═══════════════════════════════════════
+function openModal(dbId) {
+  editingId = dbId; pendingPhoto = null;
   resetPhotoUI();
-  document.getElementById('url-pane').style.display='none';
-  document.getElementById('url-input').value='';
-  document.getElementById('url-err').style.display='none';
-  document.getElementById('url-ok').style.display='none';
-  document.getElementById('file-input').value='';
+  document.getElementById('url-pane').style.display = 'none';
+  document.getElementById('url-input').value = '';
+  document.getElementById('url-err').style.display = 'none';
+  document.getElementById('url-ok').style.display = 'none';
+  document.getElementById('file-input').value = '';
 
-  if(id!==null){
-    const c=clothes.find(x=>x.id===id);
-    if(!c)return;
-    document.getElementById('modal-title').textContent='服を編集';
-    document.getElementById('f-cat').value=c.category;
-    document.getElementById('f-color').value=c.color;
-    document.getElementById('f-name').value=c.name;
-    document.getElementById('f-season').value=c.season;
-    document.getElementById('f-interval').value=c.interval;
-    ['formal','attack','fav','comfort'].forEach(k=>{
-      document.getElementById('f-'+k).value=c[k];
-      setSV(k,c[k]);
-    });
-    if(c.photo){ pendingPhoto=c.photo; setPhotoPreview(c.photo); }
-    document.getElementById('modal-footer').innerHTML=`
-      <button class="del" onclick="deleteCloth(${id})">削除</button>
-      <button onclick="closeModal()">キャンセル</button>
-      <button class="primary" onclick="saveCloth()">保存</button>`;
+  if (dbId !== null) {
+    const c = clothes.find(x => x.dbId === dbId); if (!c) return;
+    document.getElementById('modal-title').textContent = '服を編集';
+    document.getElementById('f-cat').value = c.category;
+    document.getElementById('f-color').value = c.color;
+    document.getElementById('f-name').value = c.name;
+    document.getElementById('f-season').value = c.season;
+    document.getElementById('f-interval').value = c.interval;
+    ['formal', 'attack', 'fav', 'comfort'].forEach(k => { document.getElementById('f-' + k).value = c[k]; setSV(k, c[k]); });
+    if (c.photo) { pendingPhoto = c.photo; setPhotoPreview(c.photo); }
+    document.getElementById('modal-footer').innerHTML = `<button class="del" onclick="doDelete('${dbId}')">削除</button><button onclick="closeModal()">キャンセル</button><button class="primary" onclick="saveCloth()">保存</button>`;
   } else {
-    document.getElementById('modal-title').textContent='服を追加';
-    document.getElementById('f-cat').value='ジャケット';
-    document.getElementById('f-color').value='';
-    document.getElementById('f-name').value='';
-    document.getElementById('f-season').value='春秋';
-    document.getElementById('f-interval').value=7;
-    ['formal','attack','fav','comfort'].forEach(k=>{ document.getElementById('f-'+k).value=3; setSV(k,3); });
-    document.getElementById('modal-footer').innerHTML=`
-      <button onclick="closeModal()">キャンセル</button>
-      <button class="primary" onclick="saveCloth()">追加する</button>`;
+    document.getElementById('modal-title').textContent = '服を追加';
+    document.getElementById('f-cat').value = 'ジャケット';
+    document.getElementById('f-color').value = '';
+    document.getElementById('f-name').value = '';
+    document.getElementById('f-season').value = '春秋';
+    document.getElementById('f-interval').value = 7;
+    ['formal', 'attack', 'fav', 'comfort'].forEach(k => { document.getElementById('f-' + k).value = 3; setSV(k, 3); });
+    document.getElementById('modal-footer').innerHTML = `<button onclick="closeModal()">キャンセル</button><button class="primary" onclick="saveCloth()">追加する</button>`;
   }
   document.getElementById('modal-bg').classList.add('open');
 }
+function closeModal() { document.getElementById('modal-bg').classList.remove('open'); }
+function onBgClick(e) { if (e.target === document.getElementById('modal-bg')) closeModal(); }
+function setSV(k, v) { document.getElementById('sv-' + k).textContent = v; document.getElementById('sv-' + k + '-big').textContent = v; }
 
-function closeModal(){ document.getElementById('modal-bg').classList.remove('open'); }
-function onBgClick(e){ if(e.target===document.getElementById('modal-bg')) closeModal(); }
-
-function setSV(k,v){
-  document.getElementById('sv-'+k).textContent=v;
-  document.getElementById('sv-'+k+'-big').textContent=v;
-}
-
-function saveCloth(){
-  const cat   = document.getElementById('f-cat').value;
-  const color = document.getElementById('f-color').value||'グレー';
-  const name  = document.getElementById('f-name').value||(color+cat);
-  const data  = {
-    category:cat, name, color,
-    season:document.getElementById('f-season').value,
-    formal:  parseInt(document.getElementById('f-formal').value),
-    attack:  parseInt(document.getElementById('f-attack').value),
-    fav:     parseInt(document.getElementById('f-fav').value),
-    comfort: parseInt(document.getElementById('f-comfort').value),
-    interval:parseInt(document.getElementById('f-interval').value)||7,
-    photo:   pendingPhoto,
-  };
-  if(editingId!==null){
-    const i=clothes.findIndex(c=>c.id===editingId);
-    if(i>=0) clothes[i]={...clothes[i],...data};
-    showToast('更新しました ✓');
-  } else {
-    clothes.push({id:nextId++, lastWorn:daysAgo(99), ...data});
-    showToast('追加しました ✓');
-  }
-  saveAll(); closeModal(); renderWardrobe();
-}
-
-function deleteCloth(id){
-  if(!confirm('この服を削除しますか？')) return;
-  clothes=clothes.filter(c=>c.id!==id);
-  saveAll(); closeModal(); renderWardrobe();
-  showToast('削除しました');
-}
-
-// ── PHOTO ──
-function resetPhotoUI(){
-  const img=document.getElementById('photo-preview');
-  img.src=''; img.style.display='none';
-  document.getElementById('photo-area').querySelectorAll('.ph-icon,.ph-txt')
-    .forEach(el=>el.style.display='');
-  document.getElementById('photo-del-btn').style.display='none';
-}
-
-function setPhotoPreview(src){
-  const img=document.getElementById('photo-preview');
-  img.src=src; img.style.display='block';
-  document.getElementById('photo-area').querySelectorAll('.ph-icon,.ph-txt')
-    .forEach(el=>el.style.display='none');
-  document.getElementById('photo-del-btn').style.display='';
-}
-
-function clearPhoto(){
-  pendingPhoto=null; resetPhotoUI();
-  document.getElementById('url-input').value='';
-  document.getElementById('url-ok').style.display='none';
-  document.getElementById('url-err').style.display='none';
-}
-
-function onFileChosen(e){
-  const file=e.target.files[0]; if(!file)return;
-  // compress large images before storing
-  const reader=new FileReader();
-  reader.onload=ev=>{
-    const dataUrl=ev.target.result;
-    compressImage(dataUrl, 800, 0.82, compressed=>{
-      pendingPhoto=compressed;
-      setPhotoPreview(compressed);
-    });
-  };
-  reader.readAsDataURL(file);
-}
-
-function compressImage(dataUrl, maxPx, quality, cb){
-  const img=new Image();
-  img.onload=()=>{
-    let w=img.width, h=img.height;
-    if(w>maxPx||h>maxPx){
-      if(w>h){ h=Math.round(h*maxPx/w); w=maxPx; }
-      else    { w=Math.round(w*maxPx/h); h=maxPx; }
+async function saveCloth() {
+  const cat = document.getElementById('f-cat').value;
+  const color = document.getElementById('f-color').value || 'グレー';
+  const name = document.getElementById('f-name').value || (color + cat);
+  const data = { category: cat, name, color, season: document.getElementById('f-season').value, formal: parseInt(document.getElementById('f-formal').value), attack: parseInt(document.getElementById('f-attack').value), fav: parseInt(document.getElementById('f-fav').value), comfort: parseInt(document.getElementById('f-comfort').value), interval: parseInt(document.getElementById('f-interval').value) || 7, photo: pendingPhoto };
+  setSyncDot('syncing');
+  try {
+    if (editingId !== null) {
+      const i = clothes.findIndex(c => c.dbId === editingId);
+      if (i >= 0) { clothes[i] = { ...clothes[i], ...data }; await updateCloth(clothes[i]); }
+      showToast('更新しました ✓');
+    } else {
+      const nc = await insertCloth({ ...data, lastWorn: null });
+      if (nc) clothes.push(nc);
+      showToast('追加しました ✓');
     }
-    const canvas=document.createElement('canvas');
-    canvas.width=w; canvas.height=h;
-    canvas.getContext('2d').drawImage(img,0,0,w,h);
-    cb(canvas.toDataURL('image/jpeg',quality));
-  };
-  img.src=dataUrl;
+    setSyncDot('ok');
+  } catch (e) { setSyncDot('err'); showToast('⚠️ 保存に失敗しました'); console.error(e); }
+  closeModal(); renderWardrobe();
 }
 
-function toggleUrlPane(){
-  const p=document.getElementById('url-pane');
-  p.style.display=p.style.display==='none'?'block':'none';
+async function doDelete(dbId) {
+  if (!confirm('この服を削除しますか？')) return;
+  setSyncDot('syncing');
+  try { await deleteCloth(dbId); clothes = clothes.filter(c => c.dbId !== dbId); setSyncDot('ok'); showToast('削除しました'); } catch (e) { setSyncDot('err'); showToast('⚠️ 削除に失敗しました'); }
+  closeModal(); renderWardrobe();
 }
 
-function convertDriveUrl(url){
-  const m=url.match(/\/file\/d\/([^\/\?]+)/);
-  if(m) return `https://drive.google.com/thumbnail?id=${m[1]}&sz=w600`;
-  const m2=url.match(/[?&]id=([^&]+)/);
-  if(m2) return `https://drive.google.com/thumbnail?id=${m2[1]}&sz=w600`;
-  return url;
-}
-
-function loadUrl(){
-  const raw=document.getElementById('url-input').value.trim(); if(!raw)return;
-  const url=convertDriveUrl(raw);
-  const img=document.getElementById('photo-preview');
-  document.getElementById('url-err').style.display='none';
-  document.getElementById('url-ok').style.display='none';
-  img.onload=()=>{ pendingPhoto=url; setPhotoPreview(url); document.getElementById('url-ok').style.display='block'; };
-  img.onerror=()=>{ document.getElementById('url-err').style.display='block'; img.style.display='none'; };
-  img.src=url; img.style.display='block';
-}
-
-function onImgErr(){
-  document.getElementById('url-err').style.display='block';
-  document.getElementById('photo-preview').style.display='none';
-}
-
-// range gradient update on load
-document.querySelectorAll('input[type=range]').forEach(r=>{
-  r.style.setProperty('--val', r.value);
-  r.addEventListener('input', function(){ this.style.setProperty('--val', this.value); });
-});
+// ═══════════════════════════════════════
+//  PHOTO
+// ═══════════════════════════════════════
+function resetPhotoUI() { const img = document.getElementById('photo-preview'); img.src = ''; img.style.display = 'none'; document.getElementById('photo-area').querySelectorAll('.ph-icon,.ph-txt').forEach(el => el.style.display = ''); document.getElementById('photo-del-btn').style.display = 'none'; }
+function setPhotoPreview(src) { const img = document.getElementById('photo-preview'); img.src = src; img.style.display = 'block'; document.getElementById('photo-area').querySelectorAll('.ph-icon,.ph-txt').forEach(el => el.style.display = 'none'); document.getElementById('photo-del-btn').style.display = ''; }
+function clearPhoto() { pendingPhoto = null; resetPhotoUI(); document.getElementById('url-input').value = ''; document.getElementById('url-ok').style.display = 'none'; document.getElementById('url-err').style.display = 'none'; }
+function onFileChosen(e) { const file = e.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = ev => { compressImg(ev.target.result, 800, 0.82, c => { pendingPhoto = c; setPhotoPreview(c); }); }; reader.readAsDataURL(file); }
+function compressImg(dataUrl, maxPx, q, cb) { const img = new Image(); img.onload = () => { let w = img.width, h = img.height; if (w > maxPx || h > maxPx) { if (w > h) { h = Math.round(h * maxPx / w); w = maxPx; } else { w = Math.round(w * maxPx / h); h = maxPx; } } const c = document.createElement('canvas'); c.width = w; c.height = h; c.getContext('2d').drawImage(img, 0, 0, w, h); cb(c.toDataURL('image/jpeg', q)); }; img.src = dataUrl; }
+function toggleUrlPane() { const p = document.getElementById('url-pane'); p.style.display = p.style.display === 'none' ? 'block' : 'none'; }
+function convertDriveUrl(url) { const m = url.match(/\/file\/d\/([^\/\?]+)/); if (m) return `https://drive.google.com/thumbnail?id=${m[1]}&sz=w600`; const m2 = url.match(/[?&]id=([^&]+)/); if (m2) return `https://drive.google.com/thumbnail?id=${m2[1]}&sz=w600`; return url; }
+function loadUrl() { const raw = document.getElementById('url-input').value.trim(); if (!raw) return; const url = convertDriveUrl(raw); const img = document.getElementById('photo-preview'); document.getElementById('url-err').style.display = 'none'; document.getElementById('url-ok').style.display = 'none'; img.onload = () => { pendingPhoto = url; setPhotoPreview(url); document.getElementById('url-ok').style.display = 'block'; }; img.onerror = () => { document.getElementById('url-err').style.display = 'block'; img.style.display = 'none'; }; img.src = url; img.style.display = 'block'; }
+function onImgErr() { document.getElementById('url-err').style.display = 'block'; document.getElementById('photo-preview').style.display = 'none'; }
 </script>
 </body>
 </html>
