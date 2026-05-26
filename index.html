@@ -33,6 +33,8 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min
 .sync-dot.ok{background:var(--green);}
 .sync-dot.err{background:var(--red);}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.user-btn{width:26px;height:26px;border-radius:50%;background:var(--bg2);border:1px solid var(--border);cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.user-btn:active{background:var(--bg3);}
 .content{flex:1;overflow-y:auto;padding:16px 18px calc(80px + var(--safe-b));}
 .nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:rgba(253,252,250,0.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid var(--border);display:flex;z-index:50;padding-bottom:var(--safe-b);}
 .nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;padding:9px 4px 6px;border:none;background:none;cursor:pointer;gap:3px;color:var(--text3);font-family:'DM Sans',sans-serif;font-size:10px;font-weight:500;transition:color 0.15s;position:relative;}
@@ -160,6 +162,29 @@ input[type=file].hidden{display:none;}
 .empty{text-align:center;padding:48px 20px;color:var(--text3);}
 .empty-icon{font-size:44px;margin-bottom:10px;}
 .empty-txt{font-size:13px;}
+
+/* ── Auth overlay ─────────────────────────── */
+.auth-overlay{position:fixed;inset:0;background:var(--bg);z-index:600;display:none;flex-direction:column;align-items:center;justify-content:center;padding:24px 20px;overflow-y:auto;}
+.auth-overlay.show{display:flex;}
+.auth-inner{width:100%;max-width:390px;}
+.auth-logo-wrap{text-align:center;margin-bottom:32px;}
+.auth-logo{font-family:'DM Serif Display',serif;font-size:34px;letter-spacing:-0.5px;}
+.auth-logo em{color:var(--gold);font-style:normal;}
+.auth-tagline{font-size:13px;color:var(--text3);margin-top:6px;}
+.auth-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px 20px 24px;}
+.auth-tabs{display:flex;margin-bottom:20px;border-bottom:1px solid var(--border);}
+.auth-tab{flex:1;padding:8px 4px;border:none;background:none;font-size:13px;font-weight:600;cursor:pointer;color:var(--text3);font-family:'DM Sans',sans-serif;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all 0.15s;}
+.auth-tab.active{color:var(--text);border-bottom-color:var(--gold);}
+.auth-btn{width:100%;padding:14px;background:var(--accent);color:var(--surface);border:none;border-radius:var(--r-sm);font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:2px;transition:opacity 0.15s;}
+.auth-btn:active{opacity:0.82;}
+.auth-btn:disabled{opacity:0.5;cursor:default;}
+.auth-err{font-size:12px;color:var(--red);min-height:18px;margin-bottom:6px;line-height:1.5;}
+.auth-msg{font-size:12px;color:var(--green);min-height:18px;margin-bottom:6px;line-height:1.5;}
+
+/* ── Account modal content ────────────────── */
+.acct-email-row{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--border2);margin-bottom:4px;}
+.acct-avatar{width:36px;height:36px;border-radius:50%;background:var(--gold-lt);border:1px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.acct-email-txt{font-size:13px;color:var(--text2);word-break:break-all;}
 </style>
 </head>
 <body>
@@ -169,12 +194,58 @@ input[type=file].hidden{display:none;}
   <div class="spinner"></div>
 </div>
 
+<!-- ── AUTH OVERLAY ────────────────────────── -->
+<div class="auth-overlay" id="auth-overlay">
+  <div class="auth-inner">
+    <div class="auth-logo-wrap">
+      <div class="auth-logo">Tone<em>Shift</em></div>
+      <div class="auth-tagline">ビジネスカジュアルをスマートに</div>
+    </div>
+    <div class="auth-card">
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tab-login" onclick="showAuthTab('login')">ログイン</button>
+        <button class="auth-tab" id="tab-register" onclick="showAuthTab('register')">新規登録</button>
+      </div>
+
+      <!-- Login pane -->
+      <div id="pane-login">
+        <div class="f-row">
+          <label class="f-label">メールアドレス</label>
+          <input class="f-input" type="email" id="auth-email" placeholder="your@email.com" autocomplete="email">
+        </div>
+        <div class="f-row">
+          <label class="f-label">パスワード</label>
+          <input class="f-input" type="password" id="auth-pass" placeholder="6文字以上" autocomplete="current-password">
+        </div>
+        <div class="auth-err" id="login-err"></div>
+        <button class="auth-btn" id="login-btn" onclick="doLogin()">ログイン</button>
+      </div>
+
+      <!-- Register pane -->
+      <div id="pane-register" style="display:none">
+        <div class="f-row">
+          <label class="f-label">メールアドレス</label>
+          <input class="f-input" type="email" id="reg-email" placeholder="your@email.com" autocomplete="email">
+        </div>
+        <div class="f-row">
+          <label class="f-label">パスワード</label>
+          <input class="f-input" type="password" id="reg-pass" placeholder="6文字以上" autocomplete="new-password">
+        </div>
+        <div class="auth-err" id="reg-err"></div>
+        <div class="auth-msg" id="reg-msg"></div>
+        <button class="auth-btn" id="reg-btn" onclick="doRegister()">アカウントを作成</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="app">
   <div class="status-bar-spacer"></div>
   <div class="topbar">
     <div class="logo">Tone<em>Shift</em></div>
     <div class="topbar-right">
       <div class="topbar-date" id="hdr-date"></div>
+      <button class="user-btn" id="user-btn" onclick="openAcctModal()" title="アカウント">👤</button>
       <span class="sync-dot" id="sync-dot"></span>
     </div>
   </div>
@@ -310,57 +381,186 @@ input[type=file].hidden{display:none;}
   </div>
 </div>
 
+<!-- ACCOUNT MODAL -->
+<div class="modal-bg" id="acct-bg" onclick="if(event.target===this)closeAcctModal()">
+  <div class="modal-sheet" style="padding-bottom:32px">
+    <div class="modal-handle-wrap"><div class="modal-handle"></div></div>
+    <div class="modal-title">アカウント</div>
+    <div class="acct-email-row">
+      <div class="acct-avatar">👤</div>
+      <div class="acct-email-txt" id="acct-email-txt">—</div>
+    </div>
+    <div class="modal-footer">
+      <button onclick="closeAcctModal()">閉じる</button>
+      <button class="del" onclick="doLogout()">ログアウト</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
 // ═══════════════════════════════════════
-//  SUPABASE
+//  SUPABASE CLIENT
 // ═══════════════════════════════════════
 const SB_URL = 'https://qmeyprtrwuikyhbolqzd.supabase.co';
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFtZXlwcnRyd3Vpa3loYm9scXpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2NjM1OTksImV4cCI6MjA5NDIzOTU5OX0.DTYmweRmXWU4e_ClVwswIkjy7BqpzN5KyJpQMZ6oHJ4';
+const sbClient = window.supabase.createClient(SB_URL, SB_KEY);
 
-function getDeviceId() {
-  let id = localStorage.getItem('ts_device_id');
-  if (!id) { id = 'dev_' + Math.random().toString(36).slice(2) + Date.now().toString(36); localStorage.setItem('ts_device_id', id); }
-  return id;
-}
-const DEVICE_ID = getDeviceId();
+// ═══════════════════════════════════════
+//  AUTH STATE
+// ═══════════════════════════════════════
+let currentUser = null;
+let DEVICE_ID = null;
 
-async function sb(path, method = 'GET', body = null) {
-  const res = await fetch(SB_URL + '/rest/v1/' + path, {
-    method,
-    headers: {
-      'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY,
-      'Content-Type': 'application/json',
-      'Prefer': method === 'POST' ? 'return=representation' : ''
-    },
-    body: body ? JSON.stringify(body) : null
-  });
-  if (!res.ok) throw new Error(await res.text());
-  const t = await res.text();
-  return t ? JSON.parse(t) : [];
+function translateAuthError(msg) {
+  if (msg.includes('Invalid login credentials')) return 'メールアドレスまたはパスワードが正しくありません';
+  if (msg.includes('Email not confirmed')) return 'メールアドレスの確認が必要です。受信トレイを確認してください。';
+  if (msg.includes('User already registered')) return 'このメールアドレスは既に登録されています';
+  if (msg.includes('Password should be at least')) return 'パスワードは6文字以上にしてください';
+  if (msg.includes('Unable to validate email')) return 'メールアドレスの形式が正しくありません';
+  return msg;
 }
 
-// DB変換
-function toDbCloth(c) {
-  return { device_id: DEVICE_ID, category: c.category, name: c.name, color: c.color, season: c.season, formal: c.formal, attack: c.attack, fav: c.fav, comfort: c.comfort, interval_days: c.interval, last_worn: c.lastWorn || null, photo_url: c.photo || null };
+function showAuthOverlay() { document.getElementById('auth-overlay').classList.add('show'); }
+function hideAuthOverlay() { document.getElementById('auth-overlay').classList.remove('show'); }
+
+function showAuthTab(tab) {
+  document.getElementById('pane-login').style.display = tab === 'login' ? 'block' : 'none';
+  document.getElementById('pane-register').style.display = tab === 'register' ? 'block' : 'none';
+  document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+  document.getElementById('tab-register').classList.toggle('active', tab === 'register');
+  document.getElementById('login-err').textContent = '';
+  document.getElementById('reg-err').textContent = '';
+  document.getElementById('reg-msg').textContent = '';
 }
+
+async function doLogin() {
+  const email = document.getElementById('auth-email').value.trim();
+  const pass = document.getElementById('auth-pass').value;
+  const errEl = document.getElementById('login-err');
+  const btn = document.getElementById('login-btn');
+  errEl.textContent = '';
+  if (!email || !pass) { errEl.textContent = 'メールアドレスとパスワードを入力してください'; return; }
+  btn.disabled = true; btn.textContent = '...';
+  const { data, error } = await sbClient.auth.signInWithPassword({ email, password: pass });
+  if (error) {
+    errEl.textContent = translateAuthError(error.message);
+    btn.disabled = false; btn.textContent = 'ログイン';
+    return;
+  }
+  await afterAuth(data.user);
+  btn.disabled = false; btn.textContent = 'ログイン';
+}
+
+async function doRegister() {
+  const email = document.getElementById('reg-email').value.trim();
+  const pass = document.getElementById('reg-pass').value;
+  const errEl = document.getElementById('reg-err');
+  const msgEl = document.getElementById('reg-msg');
+  const btn = document.getElementById('reg-btn');
+  errEl.textContent = ''; msgEl.textContent = '';
+  if (!email || !pass) { errEl.textContent = 'メールアドレスとパスワードを入力してください'; return; }
+  if (pass.length < 6) { errEl.textContent = 'パスワードは6文字以上にしてください'; return; }
+  btn.disabled = true; btn.textContent = '...';
+  const { data, error } = await sbClient.auth.signUp({ email, password: pass });
+  if (error) {
+    errEl.textContent = translateAuthError(error.message);
+    btn.disabled = false; btn.textContent = 'アカウントを作成';
+    return;
+  }
+  if (data.session) {
+    await afterAuth(data.user);
+  } else {
+    msgEl.textContent = '確認メールを送信しました。メールのリンクをクリックしてからログインしてください。';
+    btn.disabled = false; btn.textContent = 'アカウントを作成';
+  }
+}
+
+async function afterAuth(user) {
+  currentUser = user;
+  const oldDeviceId = localStorage.getItem('ts_device_id');
+  DEVICE_ID = user.id;
+
+  if (oldDeviceId && oldDeviceId !== user.id) {
+    try {
+      await Promise.all([
+        sbClient.from('clothes').update({ device_id: user.id }).eq('device_id', oldDeviceId),
+        sbClient.from('wear_history').update({ device_id: user.id }).eq('device_id', oldDeviceId)
+      ]);
+      localStorage.removeItem('ts_device_id');
+    } catch (e) { console.warn('Migration failed:', e); }
+  }
+
+  hideAuthOverlay();
+  document.getElementById('acct-email-txt').textContent = user.email || '';
+  await initApp();
+}
+
+async function doLogout() {
+  await sbClient.auth.signOut();
+  currentUser = null; DEVICE_ID = null;
+  clothes = []; history = [];
+  closeAcctModal();
+  showAuthOverlay();
+  showAuthTab('login');
+}
+
+function openAcctModal() {
+  if (!currentUser) return;
+  document.getElementById('acct-email-txt').textContent = currentUser.email || '';
+  document.getElementById('acct-bg').classList.add('open');
+}
+function closeAcctModal() { document.getElementById('acct-bg').classList.remove('open'); }
+
+// ═══════════════════════════════════════
+//  DB HELPERS (supabase client)
+// ═══════════════════════════════════════
 function fromDbCloth(r) {
   return { dbId: r.id, category: r.category, name: r.name, color: r.color || '', season: r.season || '通年', formal: r.formal || 3, attack: r.attack || 3, fav: r.fav || 3, comfort: r.comfort || 3, interval: r.interval_days || 7, lastWorn: r.last_worn || null, photo: r.photo_url || null };
-}
-function toDbHist(h) {
-  return { device_id: DEVICE_ID, worn_date: h.date, schedule_type: h.schedule, jacket_name: h.jacket, shirt_name: h.shirt, pants_name: h.pants, formal_level: h.formal, satisfaction: h.satisfaction, note: h.note || '' };
 }
 function fromDbHist(r) {
   return { date: r.worn_date, schedule: r.schedule_type, jacket: r.jacket_name, shirt: r.shirt_name, pants: r.pants_name, formal: r.formal_level, satisfaction: r.satisfaction || 5, note: r.note || '' };
 }
+function toDbCloth(c) {
+  return { device_id: DEVICE_ID, category: c.category, name: c.name, color: c.color, season: c.season, formal: c.formal, attack: c.attack, fav: c.fav, comfort: c.comfort, interval_days: c.interval, last_worn: c.lastWorn || null, photo_url: c.photo || null };
+}
+function toDbHist(h) {
+  return { device_id: DEVICE_ID, worn_date: h.date, schedule_type: h.schedule, jacket_name: h.jacket, shirt_name: h.shirt, pants_name: h.pants, formal_level: h.formal, satisfaction: h.satisfaction, note: h.note || '' };
+}
 
-async function fetchClothes() { return (await sb(`clothes?device_id=eq.${DEVICE_ID}&order=created_at.asc`)).map(fromDbCloth); }
-async function fetchHistory() { return (await sb(`wear_history?device_id=eq.${DEVICE_ID}&order=worn_date.desc&limit=60`)).map(fromDbHist); }
-async function insertCloth(c) { const r = await sb('clothes', 'POST', toDbCloth(c)); return r[0] ? fromDbCloth(r[0]) : null; }
-async function updateCloth(c) { await sb(`clothes?id=eq.${c.dbId}`, 'PATCH', toDbCloth(c)); }
-async function deleteCloth(dbId) { await sb(`clothes?id=eq.${dbId}`, 'DELETE'); }
-async function insertHist(h) { await sb('wear_history', 'POST', toDbHist(h)); }
+async function fetchClothes() {
+  const { data, error } = await sbClient.from('clothes').select('*').eq('device_id', DEVICE_ID).order('created_at', { ascending: true });
+  if (error) throw error;
+  return data.map(fromDbCloth);
+}
+async function fetchHistory() {
+  const { data, error } = await sbClient.from('wear_history').select('*').eq('device_id', DEVICE_ID).order('worn_date', { ascending: false }).limit(60);
+  if (error) throw error;
+  return data.map(fromDbHist);
+}
+async function insertCloth(c) {
+  const { data, error } = await sbClient.from('clothes').insert(toDbCloth(c)).select();
+  if (error) throw error;
+  return data[0] ? fromDbCloth(data[0]) : null;
+}
+async function updateCloth(c) {
+  const { error } = await sbClient.from('clothes').update(toDbCloth(c)).eq('id', c.dbId);
+  if (error) throw error;
+}
+async function deleteCloth(dbId) {
+  const { error } = await sbClient.from('clothes').delete().eq('id', dbId);
+  if (error) throw error;
+}
+async function insertHist(h) {
+  const { error } = await sbClient.from('wear_history').insert(toDbHist(h));
+  if (error) throw error;
+}
+async function updateLastWorn(ids, date) {
+  const { error } = await sbClient.from('clothes').update({ last_worn: date }).in('id', ids);
+  if (error) throw error;
+}
 
 // ═══════════════════════════════════════
 //  STATE
@@ -383,9 +583,9 @@ function setSyncDot(s) { document.getElementById('sync-dot').className = 'sync-d
 function showToast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2300); }
 
 // ═══════════════════════════════════════
-//  INIT
+//  BOOT
 // ═══════════════════════════════════════
-(async function init() {
+(async function main() {
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
 
   const now = new Date();
@@ -396,6 +596,24 @@ function showToast(msg) { const t = document.getElementById('toast'); t.textCont
   window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredInstall = e; if (!localStorage.getItem('ts_install_ok')) document.getElementById('install-banner').style.display = 'flex'; });
   document.getElementById('install-btn').addEventListener('click', async () => { if (!deferredInstall) return; deferredInstall.prompt(); const { outcome } = await deferredInstall.userChoice; if (outcome === 'accepted') dismissInstall(); deferredInstall = null; });
 
+  const { data: { session } } = await sbClient.auth.getSession();
+  const ld = document.getElementById('loading');
+  ld.classList.add('hidden');
+  setTimeout(() => ld.style.display = 'none', 400);
+
+  if (session) {
+    await afterAuth(session.user);
+  } else {
+    showAuthOverlay();
+  }
+
+  document.querySelectorAll('input[type=range]').forEach(r => {
+    r.style.setProperty('--val', r.value);
+    r.addEventListener('input', function () { this.style.setProperty('--val', this.value); });
+  });
+})();
+
+async function initApp() {
   setSyncDot('syncing');
   try {
     [clothes, history] = await Promise.all([fetchClothes(), fetchHistory()]);
@@ -405,16 +623,7 @@ function showToast(msg) { const t = document.getElementById('toast'); t.textCont
     setSyncDot('err');
     showToast('⚠️ データ読み込みに失敗しました');
   }
-
-  const ld = document.getElementById('loading');
-  ld.classList.add('hidden');
-  setTimeout(() => ld.style.display = 'none', 400);
-
-  document.querySelectorAll('input[type=range]').forEach(r => {
-    r.style.setProperty('--val', r.value);
-    r.addEventListener('input', function () { this.style.setProperty('--val', this.value); });
-  });
-})();
+}
 
 function dismissInstall() { localStorage.setItem('ts_install_ok', '1'); document.getElementById('install-banner').style.display = 'none'; }
 
@@ -475,7 +684,7 @@ async function confirmCoord(jId, sId, pId, jacket, shirt, pants, ft) {
   setSyncDot('syncing');
   try {
     const td = today();
-    await Promise.all([jId, sId, pId].map(id => sb(`clothes?id=eq.${id}`, 'PATCH', { last_worn: td })));
+    await updateLastWorn([jId, sId, pId], td);
     clothes.forEach(c => { if (c.dbId === jId || c.dbId === sId || c.dbId === pId) c.lastWorn = td; });
     setSyncDot('ok');
   } catch (e) { setSyncDot('err'); }
